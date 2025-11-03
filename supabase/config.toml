@@ -2,3 +2,6 @@ project_id = "zrapesuwygrrfwzxzfmf"
 
 [functions.phishing-detector]
 verify_jwt = false
+
+[functions.report-phishing]
+verify_jwt = false

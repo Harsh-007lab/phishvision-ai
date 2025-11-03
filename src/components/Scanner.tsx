@@ -1,24 +1,27 @@
 import { useState } from "react";
-import { Shield, AlertTriangle, Loader2, Search } from "lucide-react";
+import { Shield, AlertTriangle, Loader2, Search, Copy, RotateCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ScanResult {
   url: string;
   label: string;
   confidence: number;
+  score: number;
+  explanation?: string;
   timestamp: Date;
 }
 
 export const Scanner = () => {
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
+  const [isExplaining, setIsExplaining] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
-  const [history, setHistory] = useState<ScanResult[]>([]);
 
-  const handleScan = async () => {
+  const handleScan = async (includeExplanation = false) => {
     if (!url.trim()) {
       toast({
         title: "Error",
@@ -28,12 +31,16 @@ export const Scanner = () => {
       return;
     }
 
-    setIsScanning(true);
-    setResult(null);
+    if (includeExplanation) {
+      setIsExplaining(true);
+    } else {
+      setIsScanning(true);
+      setResult(null);
+    }
 
     try {
       const { data, error } = await supabase.functions.invoke('phishing-detector', {
-        body: { url: url.trim() }
+        body: { url: url.trim(), includeExplanation }
       });
 
       if (error) throw error;
@@ -42,16 +49,24 @@ export const Scanner = () => {
         url: url.trim(),
         label: data.label,
         confidence: data.confidence,
+        score: data.score,
+        explanation: data.explanation,
         timestamp: new Date(),
       };
 
       setResult(scanResult);
-      setHistory(prev => [scanResult, ...prev].slice(0, 5));
 
-      toast({
-        title: "Scan Complete",
-        description: `URL analyzed: ${data.label === 'phishing' ? 'Phishing detected!' : 'URL appears safe'}`,
-      });
+      if (!includeExplanation) {
+        toast({
+          title: "Scan Complete",
+          description: `URL analyzed: ${data.label === 'phishing' ? 'Phishing detected!' : 'URL appears safe'}`,
+        });
+      } else {
+        toast({
+          title: "AI Analysis Complete",
+          description: "Generated detailed explanation",
+        });
+      }
     } catch (error) {
       console.error('Scan error:', error);
       toast({
@@ -61,42 +76,71 @@ export const Scanner = () => {
       });
     } finally {
       setIsScanning(false);
+      setIsExplaining(false);
     }
+  };
+
+  const handleExplain = () => {
+    handleScan(true);
+  };
+
+  const handleCopy = () => {
+    if (!result) return;
+    
+    const text = `PhishVision AI Scan Result\n\nURL: ${result.url}\nStatus: ${result.label === 'phishing' ? '⚠️ Phishing Detected' : '✅ Safe'}\nConfidence: ${result.confidence}%${result.explanation ? `\n\nAnalysis: ${result.explanation}` : ''}`;
+    
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: "Scan result copied to clipboard",
+    });
   };
 
   const isPhishing = result?.label === 'phishing';
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 p-6">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-3">
+    <div className="w-full max-w-5xl mx-auto space-y-8 p-6">
+      {/* Header with glitch effect */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center space-y-4"
+      >
+        <motion.div
+          className="flex items-center justify-center gap-3"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
           <Shield className="w-12 h-12 text-primary animate-pulse-slow" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            PhishVision AI
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
+            PhishVision AI v3.0
           </h1>
-        </div>
+        </motion.div>
         <p className="text-lg text-muted-foreground">
-          Smart URL Scanner — Detect phishing attempts in real-time
+          Next-Generation Cybersecurity & Phishing Detection Platform
         </p>
-      </div>
+      </motion.div>
 
       {/* Scanner Input */}
-      <div className="glass rounded-2xl p-8 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="glass rounded-2xl p-8 space-y-6 glow-primary"
+      >
         <div className="flex gap-4">
           <Input
             placeholder="Enter URL to scan (e.g., https://example.com)"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleScan()}
-            className="flex-1 h-14 text-lg glass border-primary/30 focus:border-primary"
-            disabled={isScanning}
+            onKeyDown={(e) => e.key === 'Enter' && !isScanning && handleScan(false)}
+            className="flex-1 h-14 text-lg glass border-primary/30 focus:border-primary transition-all"
+            disabled={isScanning || isExplaining}
           />
           <Button
-            onClick={handleScan}
-            disabled={isScanning}
+            onClick={() => handleScan(false)}
+            disabled={isScanning || isExplaining}
             size="lg"
-            className="h-14 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+            className="h-14 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all hover:scale-105"
           >
             {isScanning ? (
               <>
@@ -113,86 +157,122 @@ export const Scanner = () => {
         </div>
 
         {/* Result Display */}
-        {result && (
-          <div
-            className={`rounded-xl p-6 border-2 transition-all duration-500 ${
-              isPhishing
-                ? 'bg-gradient-to-br from-destructive/20 to-destructive/5 border-destructive glow-danger'
-                : 'bg-gradient-to-br from-success/20 to-success/5 border-success glow-safe'
-            }`}
-          >
-            <div className="flex items-start gap-4">
-              {isPhishing ? (
-                <AlertTriangle className="w-12 h-12 text-destructive flex-shrink-0 animate-pulse" />
-              ) : (
-                <Shield className="w-12 h-12 text-success flex-shrink-0" />
-              )}
-              <div className="flex-1 space-y-2">
-                <h3 className={`text-2xl font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
-                  {isPhishing ? '⚠️ Phishing Detected' : '✅ Safe Website'}
-                </h3>
-                <p className="text-sm text-muted-foreground break-all">{result.url}</p>
-                <div className="flex items-center gap-2 mt-3">
-                  <span className="text-sm font-medium">Confidence:</span>
-                  <div className="flex-1 bg-secondary rounded-full h-3 overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-1000 ${
-                        isPhishing ? 'bg-destructive' : 'bg-success'
-                      }`}
-                      style={{ width: `${result.confidence}%` }}
-                    />
+        <AnimatePresence mode="wait">
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className={`rounded-xl p-6 border-2 transition-all duration-500 ${
+                isPhishing
+                  ? 'bg-gradient-to-br from-destructive/20 to-destructive/5 border-destructive glow-danger'
+                  : 'bg-gradient-to-br from-success/20 to-success/5 border-success glow-safe'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <motion.div
+                  animate={isPhishing ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+                  transition={{ repeat: isPhishing ? Infinity : 0, duration: 2 }}
+                >
+                  {isPhishing ? (
+                    <AlertTriangle className="w-12 h-12 text-destructive flex-shrink-0" />
+                  ) : (
+                    <Shield className="w-12 h-12 text-success flex-shrink-0" />
+                  )}
+                </motion.div>
+                
+                <div className="flex-1 space-y-3">
+                  <h3 className={`text-2xl font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
+                    {isPhishing ? '⚠️ Phishing Detected' : '✅ Safe Website'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground break-all font-mono">{result.url}</p>
+                  
+                  {/* Confidence Bar */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">Threat Confidence</span>
+                      <span className={`font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
+                        {result.confidence}%
+                      </span>
+                    </div>
+                    <div className="relative h-3 bg-secondary rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${result.confidence}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className={`h-full ${isPhishing ? 'bg-destructive' : 'bg-success'}`}
+                      />
+                    </div>
                   </div>
-                  <span className={`font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
-                    {result.confidence}%
-                  </span>
+
+                  {/* AI Explanation */}
+                  {result.explanation && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="mt-4 p-4 bg-secondary/50 rounded-lg border border-border"
+                    >
+                      <div className="flex items-start gap-2">
+                        <Sparkles className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-primary mb-1">AI Analysis</p>
+                          <p className="text-sm text-foreground leading-relaxed">{result.explanation}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleScan(false)}
+                      className="gap-2"
+                    >
+                      <RotateCw className="w-4 h-4" />
+                      Rescan
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopy}
+                      className="gap-2"
+                    >
+                      <Copy className="w-4 h-4" />
+                      Copy Result
+                    </Button>
+
+                    {!result.explanation && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleExplain}
+                        disabled={isExplaining}
+                        className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
+                      >
+                        {isExplaining ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Analyzing...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            Explain Why
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* History */}
-      {history.length > 0 && (
-        <div className="glass rounded-2xl p-6 space-y-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Search className="w-5 h-5 text-primary" />
-            Recent Scans
-          </h2>
-          <div className="space-y-2">
-            {history.map((item, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/70 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-mono truncate">{item.url}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.timestamp.toLocaleTimeString()}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 ml-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      item.label === 'phishing'
-                        ? 'bg-destructive/20 text-destructive'
-                        : 'bg-success/20 text-success'
-                    }`}
-                  >
-                    {item.label === 'phishing' ? 'Phishing' : 'Safe'}
-                  </span>
-                  <span className="text-sm font-bold">{item.confidence}%</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Footer */}
-      <div className="text-center text-sm text-muted-foreground">
-        PhishVision AI — Built with LightGBM heuristics & Lovable Cloud 💙
-      </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 };

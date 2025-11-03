@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      phishing_reports: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          reporter_email: string | null
+          status: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          reporter_email?: string | null
+          status?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          reporter_email?: string | null
+          status?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
+      scan_history: {
+        Row: {
+          confidence: number
+          created_at: string
+          explanation: string | null
+          id: string
+          label: string
+          score: number
+          url: string
+        }
+        Insert: {
+          confidence: number
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          label: string
+          score: number
+          url: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          label?: string
+          score?: number
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

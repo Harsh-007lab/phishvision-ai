@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -87,13 +88,76 @@ function calculatePhishingScore(features: PhishingFeatures): number {
   return Math.min(score, 1.0);
 }
 
+async function generateAIExplanation(url: string, features: PhishingFeatures, score: number): Promise<string> {
+  try {
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      return generateRuleBasedExplanation(features, score);
+    }
+
+    const prompt = `Analyze this URL for phishing indicators: ${url}
+    
+Score: ${score.toFixed(2)} (0=safe, 1=phishing)
+Features detected:
+- URL length: ${features.urlLength}
+- Has HTTPS: ${features.hasHttps}
+- Suspicious words: ${features.containsSuspiciousWord}
+- IP address in domain: ${features.hasIpAddress}
+- Suspicious TLD: ${features.hasSuspiciousTld}
+- URL shortener: ${features.hasShortener}
+
+Provide a brief, user-friendly 2-sentence explanation of why this URL is ${score > 0.5 ? 'suspicious' : 'safe'}.`;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: 'You are a cybersecurity expert. Provide clear, concise explanations.' },
+          { role: 'user', content: prompt }
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('AI API error:', response.status);
+      return generateRuleBasedExplanation(features, score);
+    }
+
+    const data = await response.json();
+    return data.choices[0]?.message?.content || generateRuleBasedExplanation(features, score);
+  } catch (error) {
+    console.error('AI explanation error:', error);
+    return generateRuleBasedExplanation(features, score);
+  }
+}
+
+function generateRuleBasedExplanation(features: PhishingFeatures, score: number): string {
+  if (score > 0.5) {
+    const reasons = [];
+    if (features.hasIpAddress) reasons.push('uses IP address instead of domain');
+    if (!features.hasHttps) reasons.push('lacks HTTPS encryption');
+    if (features.containsSuspiciousWord) reasons.push('contains suspicious keywords like "login" or "verify"');
+    if (features.hasSuspiciousTld) reasons.push('uses suspicious domain extension');
+    if (features.hasShortener) reasons.push('is a URL shortener');
+    
+    return `This URL appears suspicious because it ${reasons.slice(0, 2).join(' and ')}. Be cautious when clicking such links.`;
+  } else {
+    return 'This URL appears legitimate with standard security indicators and no obvious phishing patterns detected.';
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { url } = await req.json();
+    const { url, includeExplanation = false } = await req.json();
 
     if (!url || typeof url !== 'string') {
       return new Response(
@@ -115,14 +179,38 @@ serve(async (req) => {
     const features = extractFeatures(url);
     const score = calculatePhishingScore(features);
     const label = score > 0.5 ? 'phishing' : 'safe';
+    
+    let explanation = null;
+    if (includeExplanation) {
+      explanation = await generateAIExplanation(url, features, score);
+    }
 
     console.log(`🔍 Analyzed URL: ${url} | Score: ${score.toFixed(2)} | Label: ${label}`);
+
+    // Save to database
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      await supabase.from('scan_history').insert({
+        url,
+        label,
+        score: parseFloat(score.toFixed(2)),
+        confidence: parseFloat((score * 100).toFixed(1)),
+        explanation,
+      });
+    } catch (dbError) {
+      console.error('Database save error:', dbError);
+      // Continue even if DB save fails
+    }
 
     return new Response(
       JSON.stringify({ 
         score: parseFloat(score.toFixed(2)),
         label,
         confidence: parseFloat((score * 100).toFixed(1)),
+        explanation,
       }),
       { 
         status: 200, 
