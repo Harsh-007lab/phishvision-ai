@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { motion } from "framer-motion";
 import { TrendingUp, Shield, AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const Analytics = () => {
   const [stats, setStats] = useState({
@@ -11,6 +12,7 @@ export const Analytics = () => {
     safeUrls: 0,
     last24Hours: [] as { hour: string; count: number }[],
   });
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadStats();
@@ -83,7 +85,7 @@ export const Analytics = () => {
     >
       <h2 className="text-xl font-semibold flex items-center gap-2">
         <TrendingUp className="w-5 h-5 text-primary" />
-        Analytics Dashboard
+        {t('analytics')}
       </h2>
 
       {/* Stats Cards */}
@@ -93,7 +95,7 @@ export const Analytics = () => {
             <Shield className="w-8 h-8 text-primary" />
             <div>
               <p className="text-2xl font-bold">{stats.totalScans}</p>
-              <p className="text-sm text-muted-foreground">Total Scans</p>
+              <p className="text-sm text-muted-foreground">{t('totalScans')}</p>
             </div>
           </div>
         </div>
@@ -103,7 +105,7 @@ export const Analytics = () => {
             <Shield className="w-8 h-8 text-success" />
             <div>
               <p className="text-2xl font-bold">{stats.safeUrls}</p>
-              <p className="text-sm text-muted-foreground">Safe URLs</p>
+              <p className="text-sm text-muted-foreground">{t('safeUrls')}</p>
             </div>
           </div>
         </div>
@@ -113,7 +115,7 @@ export const Analytics = () => {
             <AlertTriangle className="w-8 h-8 text-destructive" />
             <div>
               <p className="text-2xl font-bold">{stats.phishingDetected}</p>
-              <p className="text-sm text-muted-foreground">Threats Blocked</p>
+              <p className="text-sm text-muted-foreground">{t('threatsBlocked')}</p>
             </div>
           </div>
         </div>
@@ -124,7 +126,7 @@ export const Analytics = () => {
         {/* Bar Chart */}
         {stats.last24Hours.length > 0 && (
           <div>
-            <h3 className="text-sm font-medium mb-3">Scans (Last 24 Hours)</h3>
+            <h3 className="text-sm font-medium mb-3">{t('last24Hours')}</h3>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={stats.last24Hours}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -146,7 +148,7 @@ export const Analytics = () => {
         {/* Pie Chart */}
         {stats.totalScans > 0 && (
           <div>
-            <h3 className="text-sm font-medium mb-3">Threat Distribution</h3>
+            <h3 className="text-sm font-medium mb-3">{t('threatDistribution')}</h3>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie

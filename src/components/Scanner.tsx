@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { VoiceInput } from "./VoiceInput";
+import { PDFReport } from "./PDFReport";
+import { useTranslation } from "react-i18next";
 
 interface ScanResult {
   url: string;
@@ -20,6 +23,15 @@ export const Scanner = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [isExplaining, setIsExplaining] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
+  const { t } = useTranslation();
+
+  const handleVoiceTranscript = (transcript: string) => {
+    setUrl(transcript);
+    // Auto-trigger scan after a short delay
+    setTimeout(() => {
+      handleScan(false);
+    }, 500);
+  };
 
   const handleScan = async (includeExplanation = false) => {
     if (!url.trim()) {
@@ -113,11 +125,11 @@ export const Scanner = () => {
         >
           <Shield className="w-12 h-12 text-primary animate-pulse-slow" />
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-            PhishVision AI v3.0
+            {t('appName')}
           </h1>
         </motion.div>
         <p className="text-lg text-muted-foreground">
-          Next-Generation Cybersecurity & Phishing Detection Platform
+          {t('tagline')}
         </p>
       </motion.div>
 
@@ -129,13 +141,16 @@ export const Scanner = () => {
       >
         <div className="flex gap-4">
           <Input
-            placeholder="Enter URL to scan (e.g., https://example.com)"
+            placeholder={t('scanPlaceholder')}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !isScanning && handleScan(false)}
             className="flex-1 h-14 text-lg glass border-primary/30 focus:border-primary transition-all"
             disabled={isScanning || isExplaining}
           />
+          
+          <VoiceInput onTranscript={handleVoiceTranscript} />
+          
           <Button
             onClick={() => handleScan(false)}
             disabled={isScanning || isExplaining}
@@ -145,12 +160,12 @@ export const Scanner = () => {
             {isScanning ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Scanning
+                {t('scanning')}
               </>
             ) : (
               <>
                 <Search className="mr-2 h-5 w-5" />
-                Scan Now
+                {t('scanButton')}
               </>
             )}
           </Button>
@@ -184,14 +199,14 @@ export const Scanner = () => {
                 
                 <div className="flex-1 space-y-3">
                   <h3 className={`text-2xl font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
-                    {isPhishing ? '⚠️ Phishing Detected' : '✅ Safe Website'}
+                    {isPhishing ? t('phishingDetected') : t('safeWebsite')}
                   </h3>
                   <p className="text-sm text-muted-foreground break-all font-mono">{result.url}</p>
                   
                   {/* Confidence Bar */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">Threat Confidence</span>
+                      <span className="font-medium">{t('threatConfidence')}</span>
                       <span className={`font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
                         {result.confidence}%
                       </span>
@@ -216,7 +231,7 @@ export const Scanner = () => {
                       <div className="flex items-start gap-2">
                         <Sparkles className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm font-semibold text-primary mb-1">AI Analysis</p>
+                          <p className="text-sm font-semibold text-primary mb-1">{t('aiAnalysis')}</p>
                           <p className="text-sm text-foreground leading-relaxed">{result.explanation}</p>
                         </div>
                       </div>
@@ -232,7 +247,7 @@ export const Scanner = () => {
                       className="gap-2"
                     >
                       <RotateCw className="w-4 h-4" />
-                      Rescan
+                      {t('rescan')}
                     </Button>
                     
                     <Button
@@ -242,7 +257,7 @@ export const Scanner = () => {
                       className="gap-2"
                     >
                       <Copy className="w-4 h-4" />
-                      Copy Result
+                      {t('copyResult')}
                     </Button>
 
                     {!result.explanation && (
@@ -256,16 +271,24 @@ export const Scanner = () => {
                         {isExplaining ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            Analyzing...
+                            {t('analyzing')}
                           </>
                         ) : (
                           <>
                             <Sparkles className="w-4 h-4" />
-                            Explain Why
+                            {t('explainWhy')}
                           </>
                         )}
                       </Button>
                     )}
+
+                    <PDFReport
+                      url={result.url}
+                      label={result.label}
+                      confidence={result.confidence}
+                      score={result.score}
+                      explanation={result.explanation}
+                    />
                   </div>
                 </div>
               </div>

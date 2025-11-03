@@ -3,11 +3,22 @@ import { ScanHistory } from "@/components/ScanHistory";
 import { Analytics } from "@/components/Analytics";
 import { ReportModal } from "@/components/ReportModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useState } from "react";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { HelpDialog } from "@/components/HelpDialog";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import '../lib/i18n';
 
 const Index = () => {
   const [scanUrl, setScanUrl] = useState("");
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    // Update HTML lang attribute
+    document.documentElement.lang = 'en';
+  }, []);
 
   const handleRescan = (url: string) => {
     setScanUrl(url);
@@ -47,6 +58,7 @@ const Index = () => {
       {/* Header */}
       <div className="relative z-10 flex justify-end p-6">
         <div className="flex items-center gap-4">
+          <LanguageSelector />
           <ReportModal />
           <ThemeToggle />
         </div>
@@ -66,12 +78,19 @@ const Index = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          PhishVision AI v3.0 — Powered by LightGBM Heuristics & Lovable Cloud 💙
+          {t('poweredBy')}
         </motion.p>
         <p className="mt-2 text-xs">
-          Next-Generation Cybersecurity & Phishing Detection Platform
+          {t('tagline')}
+        </p>
+        <p className="mt-1 text-xs opacity-70">
+          Last Updated: {new Date().toLocaleDateString()}
         </p>
       </div>
+
+      {/* Floating Action Buttons */}
+      <ScrollToTop />
+      <HelpDialog />
     </div>
   );
 };

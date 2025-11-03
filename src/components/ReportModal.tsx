@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Flag, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const ReportModal = () => {
   const [open, setOpen] = useState(false);
@@ -16,6 +17,7 @@ export const ReportModal = () => {
     email: '',
     description: '',
   });
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +31,8 @@ export const ReportModal = () => {
       if (error) throw error;
 
       toast({
-        title: "Report Submitted",
-        description: "Thank you for helping make the web safer!",
+        title: t('reportSubmitted'),
+        description: t('thankYou'),
       });
 
       setFormData({ url: '', email: '', description: '' });
@@ -52,7 +54,7 @@ export const ReportModal = () => {
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Flag className="w-4 h-4" />
-          Report Phishing
+          {t('reportPhishing')}
         </Button>
       </DialogTrigger>
       <DialogContent className="glass">
@@ -65,7 +67,7 @@ export const ReportModal = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="url">URL *</Label>
+            <Label htmlFor="url">{t('reportUrl')} *</Label>
             <Input
               id="url"
               type="url"
@@ -78,7 +80,7 @@ export const ReportModal = () => {
           </div>
 
           <div>
-            <Label htmlFor="email">Your Email (optional)</Label>
+            <Label htmlFor="email">{t('yourEmail')}</Label>
             <Input
               id="email"
               type="email"
@@ -90,7 +92,7 @@ export const ReportModal = () => {
           </div>
 
           <div>
-            <Label htmlFor="description">Description (optional)</Label>
+            <Label htmlFor="description">{t('description')}</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -104,10 +106,10 @@ export const ReportModal = () => {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
+                {t('submitting')}
               </>
             ) : (
-              'Submit Report'
+              t('submitReport')
             )}
           </Button>
         </form>

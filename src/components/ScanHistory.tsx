@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Search, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface ScanRecord {
   id: string;
@@ -15,6 +16,7 @@ interface ScanRecord {
 export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) => {
   const [history, setHistory] = useState<ScanRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   const loadHistory = async () => {
     setLoading(true);
@@ -75,7 +77,7 @@ export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) =
     return (
       <div className="glass rounded-2xl p-6 text-center text-muted-foreground">
         <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p>No scans yet. Start scanning URLs to see history.</p>
+        <p>{t('noScansYet')}</p>
       </div>
     );
   }
@@ -89,7 +91,7 @@ export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) =
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Search className="w-5 h-5 text-primary" />
-          Recent Scans
+          {t('recentScans')}
         </h2>
         <Button variant="ghost" size="sm" onClick={loadHistory}>
           <RefreshCw className="w-4 h-4" />
