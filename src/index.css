@@ -54,6 +54,50 @@ All colors MUST be HSL.
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 189 97% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 20% 35%;
+
+    --accent: 189 97% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 189 97% 45%;
+
+    --gradient-cyber: linear-gradient(135deg, hsl(189 97% 55% / 0.1), hsl(210 40% 98%));
+    --gradient-danger: linear-gradient(135deg, hsl(0 84% 60% / 0.2), hsl(0 84% 95%));
+    --gradient-safe: linear-gradient(135deg, hsl(142 76% 36% / 0.2), hsl(142 76% 95%));
+    
+    --glow-primary: 0 0 40px hsl(189 97% 55% / 0.2);
+    --glow-danger: 0 0 40px hsl(0 84% 60% / 0.3);
+    --glow-safe: 0 0 40px hsl(142 76% 36% / 0.3);
+  }
 }
 
 @layer base {
@@ -62,17 +106,30 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
-    background: linear-gradient(to bottom, hsl(222 47% 11%), hsl(222 47% 8%));
+    @apply bg-background text-foreground transition-colors duration-300;
     min-height: 100vh;
+  }
+
+  :root:not(.light) body {
+    background: linear-gradient(to bottom, hsl(222 47% 11%), hsl(222 47% 8%));
+  }
+
+  .light body {
+    background: linear-gradient(to bottom, hsl(0 0% 100%), hsl(210 40% 98%));
   }
 }
 
 @layer utilities {
   .glass {
-    background: hsl(222 47% 14% / 0.6);
+    background: hsl(var(--card) / 0.6);
     backdrop-filter: blur(12px);
-    border: 1px solid hsl(217 33% 20% / 0.5);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .light .glass {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.8);
   }
 
   .glow-primary {
