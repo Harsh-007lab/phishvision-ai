@@ -157,13 +157,18 @@ serve(async (req) => {
   }
 
   try {
-    const { url, includeExplanation = false } = await req.json();
+    let { url, includeExplanation = false } = await req.json();
 
     if (!url || typeof url !== 'string') {
       return new Response(
         JSON.stringify({ error: 'Invalid URL provided' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Auto-prepend https:// if protocol is missing
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
     }
 
     // Validate URL format
