@@ -1,10 +1,33 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Simple in-memory rate limiter
+const rateLimiter = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 20; // requests per minute
+const RATE_WINDOW = 60000; // 1 minute in milliseconds
+
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const record = rateLimiter.get(ip);
+
+  if (!record || now > record.resetTime) {
+    rateLimiter.set(ip, { count: 1, resetTime: now + RATE_WINDOW });
+    return { allowed: true, remaining: RATE_LIMIT - 1 };
+  }
+
+  if (record.count >= RATE_LIMIT) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  record.count++;
+  return { allowed: true, remaining: RATE_LIMIT - record.count };
+}
 
 interface PhishingFeatures {
   urlLength: number;
@@ -157,14 +180,47 @@ serve(async (req) => {
   }
 
   try {
-    let { url, includeExplanation = false } = await req.json();
-
-    if (!url || typeof url !== 'string') {
+    // Rate limiting check
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+    
+    const rateCheck = checkRateLimit(clientIP);
+    if (!rateCheck.allowed) {
       return new Response(
-        JSON.stringify({ error: 'Invalid URL provided' }),
+        JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'X-RateLimit-Remaining': '0',
+            'Retry-After': '60'
+          } 
+        }
+      );
+    }
+
+    const requestBody = await req.json();
+
+    // Define comprehensive validation schema
+    const scanSchema = z.object({
+      url: z.string().trim().max(2048, { message: 'URL must be less than 2048 characters' }),
+      includeExplanation: z.boolean().optional().default(false)
+    });
+
+    // Validate input
+    const validationResult = scanSchema.safeParse(requestBody);
+    
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+      return new Response(
+        JSON.stringify({ error: 'Validation failed', details: errors }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    let { url, includeExplanation } = validationResult.data;
 
     // Auto-prepend https:// if protocol is missing
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
@@ -219,7 +275,11 @@ serve(async (req) => {
       }),
       { 
         status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json',
+          'X-RateLimit-Remaining': rateCheck.remaining.toString()
+        } 
       }
     );
   } catch (error) {
