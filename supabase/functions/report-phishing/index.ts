@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,14 +13,27 @@ serve(async (req) => {
   }
 
   try {
-    const { url, email, description } = await req.json();
+    const requestBody = await req.json();
 
-    if (!url || typeof url !== 'string') {
+    // Define comprehensive validation schema
+    const reportSchema = z.object({
+      url: z.string().trim().url({ message: 'Invalid URL format' }).max(2048, { message: 'URL must be less than 2048 characters' }),
+      email: z.string().trim().email({ message: 'Invalid email format' }).max(254, { message: 'Email must be less than 254 characters' }).optional().or(z.literal('')),
+      description: z.string().trim().max(2000, { message: 'Description must be less than 2000 characters' }).optional().or(z.literal(''))
+    });
+
+    // Validate input
+    const validationResult = reportSchema.safeParse(requestBody);
+    
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
       return new Response(
-        JSON.stringify({ error: 'Invalid URL provided' }),
+        JSON.stringify({ error: 'Validation failed', details: errors }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const { url, email, description } = validationResult.data;
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
