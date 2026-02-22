@@ -227,12 +227,26 @@ serve(async (req) => {
       url = 'https://' + url;
     }
 
-    // Validate URL format
+    // Validate URL format and block private/reserved IPs
+    let urlObj: URL;
     try {
-      new URL(url);
+      urlObj = new URL(url);
     } catch {
       return new Response(
         JSON.stringify({ error: 'Malformed URL' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const hostname = urlObj.hostname.toLowerCase();
+    const privateRanges = [
+      /^127\./, /^10\./, /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+      /^192\.168\./, /^169\.254\./, /^0\./, /^::1$/,
+      /^fe80:/i, /^fc00:/i, /^fd00:/i, /^localhost$/i,
+    ];
+    if (privateRanges.some(r => r.test(hostname))) {
+      return new Response(
+        JSON.stringify({ error: 'Private or reserved addresses are not allowed' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
