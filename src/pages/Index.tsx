@@ -80,7 +80,7 @@ const Index = () => {
           className="text-xs"
         >
           {t('tagline')}
-        </p>
+        </motion.p>
         <p className="mt-1 text-xs opacity-70">
           Last Updated: {new Date().toLocaleDateString()}
         </p>
