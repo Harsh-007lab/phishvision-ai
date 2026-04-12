@@ -77,10 +77,8 @@ const Index = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
+          className="text-xs"
         >
-          {t('poweredBy')}
-        </motion.p>
-        <p className="mt-2 text-xs">
           {t('tagline')}
         </p>
         <p className="mt-1 text-xs opacity-70">
