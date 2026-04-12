@@ -84,7 +84,7 @@ export const VoiceInput = ({ onTranscript }: VoiceInputProps) => {
               variant="outline"
               size="icon"
               onClick={toggleListening}
-              className={`h-14 w-14 rounded-full transition-all ${
+              className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full transition-all ${
                 isListening 
                   ? 'bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30' 
                   : 'bg-primary/10 border-primary/50 text-primary hover:bg-primary/20'

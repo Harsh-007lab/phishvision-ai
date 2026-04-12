@@ -42,7 +42,7 @@ export const HelpDialog = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <motion.div
-          className="fixed bottom-24 right-8 z-50"
+          className="fixed bottom-24 right-4 sm:right-8 z-50"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >

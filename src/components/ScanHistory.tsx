@@ -105,17 +105,17 @@ export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) =
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/70 transition-colors"
+            className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/70 transition-colors gap-2 sm:gap-0"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-mono truncate">{item.url}</p>
+              <p className="text-xs sm:text-sm font-mono truncate">{item.url}</p>
               <p className="text-xs text-muted-foreground">
                 {new Date(item.created_at).toLocaleString()}
               </p>
             </div>
-            <div className="flex items-center gap-3 ml-4">
+            <div className="flex items-center gap-2 sm:gap-3 sm:ml-4">
               <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${
                   item.label === 'phishing'
                     ? 'bg-destructive/20 text-destructive'
                     : 'bg-success/20 text-success'
@@ -128,7 +128,6 @@ export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) =
                 variant="ghost"
                 size="sm"
                 onClick={() => onRescan(item.url)}
-                className="ml-2"
               >
                 <RefreshCw className="w-4 h-4" />
               </Button>
