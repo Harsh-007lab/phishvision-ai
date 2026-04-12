@@ -111,7 +111,7 @@ export const Scanner = () => {
   const isPhishing = result?.label === 'phishing';
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8 p-6">
+    <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8 p-3 sm:p-6">
       {/* Header with glitch effect */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -124,7 +124,7 @@ export const Scanner = () => {
           transition={{ type: "spring", stiffness: 300 }}
         >
           <Shield className="w-12 h-12 text-primary animate-pulse-slow" />
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
+          <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
             {t('appName')}
           </h1>
         </motion.div>
@@ -137,25 +137,26 @@ export const Scanner = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass rounded-2xl p-8 space-y-6 glow-primary"
+        className="glass rounded-2xl p-4 sm:p-8 space-y-6 glow-primary"
       >
-        <div className="flex gap-4">
-          <Input
-            placeholder={t('scanPlaceholder')}
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !isScanning && handleScan(false)}
-            className="flex-1 h-14 text-lg glass border-primary/30 focus:border-primary transition-all"
-            disabled={isScanning || isExplaining}
-          />
-          
-          <VoiceInput onTranscript={handleVoiceTranscript} />
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <div className="flex gap-2 sm:gap-4 flex-1">
+            <Input
+              placeholder={t('scanPlaceholder')}
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && !isScanning && handleScan(false)}
+              className="flex-1 h-12 sm:h-14 text-base sm:text-lg glass border-primary/30 focus:border-primary transition-all"
+              disabled={isScanning || isExplaining}
+            />
+            <VoiceInput onTranscript={handleVoiceTranscript} />
+          </div>
           
           <Button
             onClick={() => handleScan(false)}
             disabled={isScanning || isExplaining}
             size="lg"
-            className="h-14 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all hover:scale-105"
+            className="h-12 sm:h-14 px-6 sm:px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all hover:scale-105 w-full sm:w-auto"
           >
             {isScanning ? (
               <>
@@ -185,20 +186,21 @@ export const Scanner = () => {
                   : 'bg-gradient-to-br from-success/20 to-success/5 border-success glow-safe'
               }`}
             >
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                 <motion.div
                   animate={isPhishing ? { scale: [1, 1.1, 1] } : { scale: 1 }}
                   transition={{ repeat: isPhishing ? Infinity : 0, duration: 2 }}
+                  className="flex-shrink-0"
                 >
                   {isPhishing ? (
-                    <AlertTriangle className="w-12 h-12 text-destructive flex-shrink-0" />
+                    <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-destructive" />
                   ) : (
-                    <Shield className="w-12 h-12 text-success flex-shrink-0" />
+                    <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-success" />
                   )}
                 </motion.div>
                 
-                <div className="flex-1 space-y-3">
-                  <h3 className={`text-2xl font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
+                <div className="flex-1 min-w-0 space-y-3">
+                  <h3 className={`text-xl sm:text-2xl font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
                     {isPhishing ? t('phishingDetected') : t('safeWebsite')}
                   </h3>
                   <p className="text-sm text-muted-foreground break-all font-mono">{result.url}</p>

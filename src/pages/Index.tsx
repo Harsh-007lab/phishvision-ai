@@ -56,8 +56,8 @@ const Index = () => {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 flex justify-end p-6">
-        <div className="flex items-center gap-4">
+      <div className="relative z-10 flex justify-end p-4 sm:p-6">
+        <div className="flex items-center gap-2 sm:gap-4">
           <LanguageSelector />
           <ReportModal />
           <ThemeToggle />
@@ -65,7 +65,7 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center py-12 px-4 space-y-12">
+      <div className="relative z-10 flex flex-col items-center justify-center py-6 sm:py-12 px-3 sm:px-4 space-y-8 sm:space-y-12">
         <Scanner key={scanUrl} />
         <Analytics />
         <ScanHistory onRescan={handleRescan} />
