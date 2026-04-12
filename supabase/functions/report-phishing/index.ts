@@ -40,6 +40,7 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -115,8 +116,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('❌ Error in report-phishing:', error);
+    const corsHeaders = getCorsHeaders(req);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'An unexpected error occurred. Please try again.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
