@@ -2,10 +2,20 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const allowedOrigins = [
+  'https://phishvision-ai.lovable.app',
+  'https://id-preview--38e11c64-30ad-40d4-a467-8ea9b398dd22.lovable.app',
+  'http://localhost:5173',
+  'http://localhost:8080',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  return {
+    'Access-Control-Allow-Origin': allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 // Simple in-memory rate limiter
 const rateLimiter = new Map<string, { count: number; resetTime: number }>();
@@ -175,6 +185,7 @@ function generateRuleBasedExplanation(features: PhishingFeatures, score: number)
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -298,8 +309,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('❌ Error in phishing-detector:', error);
+    const corsHeaders = getCorsHeaders(req);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'An unexpected error occurred. Please try again.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
