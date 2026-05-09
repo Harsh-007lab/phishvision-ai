@@ -11,8 +11,10 @@ const allowedOrigins = [
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get('origin') || '';
+  const isExtension = origin.startsWith('chrome-extension://') || origin.startsWith('moz-extension://');
+  const allowed = allowedOrigins.includes(origin) || isExtension;
   return {
-    'Access-Control-Allow-Origin': allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Origin': allowed ? origin : allowedOrigins[0],
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   };
 }
