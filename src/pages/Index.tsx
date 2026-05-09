@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { HelpDialog } from "@/components/HelpDialog";
+import { InstallExtension } from "@/components/InstallExtension";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -67,6 +68,7 @@ const Index = () => {
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center justify-center py-6 sm:py-12 px-3 sm:px-4 space-y-8 sm:space-y-12">
         <Scanner key={scanUrl} />
+        <InstallExtension />
         <Analytics />
         <ScanHistory onRescan={handleRescan} />
       </div>
