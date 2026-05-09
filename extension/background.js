@@ -1,8 +1,19 @@
 // PhishVision AI - Background Service Worker (MV3)
 // Cross-browser: use globalThis.browser fallback to chrome
-import { ENDPOINT, SUPABASE_ANON_KEY, CACHE_TTL, HISTORY_LIMIT, shouldSkip, classify } from "./config.js";
-
 const api = (typeof browser !== "undefined" ? browser : chrome);
+
+const SUPABASE_URL = "https://zrapesuwygrrfwzxzfmf.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyYXBlc3V3eWdycmZ3enh6Zm1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMjI1OTYsImV4cCI6MjA3NzY5ODU5Nn0.mOCOLk4lzJ1xvpnTUI_ztdbPLrT1g3_haaNpf8KtH1k";
+const ENDPOINT = `${SUPABASE_URL}/functions/v1/phishing-detector`;
+const CACHE_TTL = 10 * 60 * 1000;
+const HISTORY_LIMIT = 50;
+const SKIP_SCHEMES = ["chrome:", "chrome-extension:", "moz-extension:", "about:", "edge:", "brave:", "view-source:", "file:"];
+function shouldSkip(url) { if (!url) return true; return SKIP_SCHEMES.some((s) => url.startsWith(s)); }
+function classify(label, confidence) {
+  if (label === "phishing" && confidence >= 70) return { level: "dangerous", color: "#ef4444", badgeText: "!" };
+  if (label === "phishing" || confidence >= 50) return { level: "suspicious", color: "#f59e0b", badgeText: "?" };
+  return { level: "safe", color: "#10b981", badgeText: "\u2713" };
+}
 
 // In-memory caches
 const tabResults = new Map(); // tabId -> result
