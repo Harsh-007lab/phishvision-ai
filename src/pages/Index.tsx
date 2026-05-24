@@ -27,7 +27,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-x-hidden">
       {/* Animated background orbs */}
       <div className="fixed inset-0 pointer-events-none">
         <motion.div
@@ -66,7 +66,7 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center py-6 sm:py-12 px-3 sm:px-4 space-y-8 sm:space-y-12">
+      <div className="relative z-10 flex w-full min-w-0 flex-col items-center justify-center py-6 sm:py-12 px-3 sm:px-4 space-y-8 sm:space-y-12 overflow-x-hidden">
         <Scanner key={scanUrl} />
         <InstallExtension />
         <Analytics />

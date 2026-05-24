@@ -86,7 +86,7 @@ export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) =
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass rounded-2xl p-6 space-y-4"
+      className="glass rounded-2xl p-4 sm:p-6 space-y-4 w-full max-w-5xl min-w-0 overflow-hidden"
     >
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -98,18 +98,18 @@ export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) =
         </Button>
       </div>
 
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="space-y-2 max-h-96 overflow-y-auto overflow-x-hidden min-w-0">
         {history.map((item, idx) => (
           <motion.div
             key={item.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/70 transition-colors gap-2 sm:gap-4 w-full overflow-hidden"
+            className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/70 transition-colors gap-2 sm:gap-4 w-full min-w-0 overflow-hidden"
           >
             <div className="flex-1 min-w-0 max-w-full overflow-hidden">
               <p
-                className="text-xs sm:text-sm font-mono truncate max-w-full"
+                className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs sm:text-sm font-mono"
                 title={item.url}
               >
                 {item.url}

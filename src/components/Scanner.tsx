@@ -111,7 +111,7 @@ export const Scanner = () => {
   const isPhishing = result?.label === 'phishing';
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8 p-3 sm:p-6">
+    <div className="w-full max-w-5xl min-w-0 mx-auto space-y-6 sm:space-y-8 p-3 sm:p-6 overflow-hidden">
       {/* Header with glitch effect */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -137,7 +137,7 @@ export const Scanner = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass rounded-2xl p-4 sm:p-8 space-y-6 glow-primary"
+        className="glass rounded-2xl p-4 sm:p-8 space-y-6 glow-primary w-full min-w-0 overflow-hidden"
       >
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex gap-2 sm:gap-4 flex-1">
@@ -180,7 +180,7 @@ export const Scanner = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className={`rounded-xl p-6 border-2 transition-all duration-500 ${
+              className={`rounded-xl p-4 sm:p-6 border-2 transition-all duration-500 w-full min-w-0 overflow-hidden ${
                 isPhishing
                   ? 'bg-gradient-to-br from-destructive/20 to-destructive/5 border-destructive glow-danger'
                   : 'bg-gradient-to-br from-success/20 to-success/5 border-success glow-safe'
@@ -203,7 +203,12 @@ export const Scanner = () => {
                   <h3 className={`text-xl sm:text-2xl font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
                     {isPhishing ? t('phishingDetected') : t('safeWebsite')}
                   </h3>
-                  <p className="text-sm text-muted-foreground break-all font-mono">{result.url}</p>
+                  <p
+                    className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded-md bg-secondary/40 px-3 py-2 text-sm text-muted-foreground font-mono"
+                    title={result.url}
+                  >
+                    {result.url}
+                  </p>
                   
                   {/* Confidence Bar */}
                   <div className="space-y-2">
