@@ -203,7 +203,12 @@ export const Scanner = () => {
                   <h3 className={`text-xl sm:text-2xl font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
                     {isPhishing ? t('phishingDetected') : t('safeWebsite')}
                   </h3>
-                  <p className="max-w-full overflow-hidden break-all text-sm text-muted-foreground font-mono" title={result.url}>{result.url}</p>
+                  <p
+                    className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded-md bg-secondary/40 px-3 py-2 text-sm text-muted-foreground font-mono"
+                    title={result.url}
+                  >
+                    {result.url}
+                  </p>
                   
                   {/* Confidence Bar */}
                   <div className="space-y-2">
