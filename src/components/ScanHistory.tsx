@@ -105,15 +105,20 @@ export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) =
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/70 transition-colors gap-2 sm:gap-0"
+            className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg bg-secondary/50 border border-border hover:bg-secondary/70 transition-colors gap-2 sm:gap-4 w-full overflow-hidden"
           >
-            <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm font-mono truncate">{item.url}</p>
+            <div className="flex-1 min-w-0 max-w-full overflow-hidden">
+              <p
+                className="text-xs sm:text-sm font-mono truncate max-w-full"
+                title={item.url}
+              >
+                {item.url}
+              </p>
               <p className="text-xs text-muted-foreground">
                 {new Date(item.created_at).toLocaleString()}
               </p>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3 sm:ml-4">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <span
                 className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${
                   item.label === 'phishing'
