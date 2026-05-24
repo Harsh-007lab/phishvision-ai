@@ -2,20 +2,18 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
-const allowedOrigins = [
-  'https://phishvision-ai.lovable.app',
-  'https://id-preview--38e11c64-30ad-40d4-a467-8ea9b398dd22.lovable.app',
-  'http://localhost:5173',
-  'http://localhost:8080',
-];
-
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get('origin') || '';
   const isExtension = origin.startsWith('chrome-extension://') || origin.startsWith('moz-extension://');
-  const allowed = allowedOrigins.includes(origin) || isExtension;
+  const isLovable = /^https:\/\/([a-z0-9-]+\.)*lovable\.(app|dev)$/i.test(origin);
+  const isLocalhost = /^http:\/\/localhost(:\d+)?$/i.test(origin);
+  const allowed = isExtension || isLovable || isLocalhost;
   return {
-    'Access-Control-Allow-Origin': allowed ? origin : allowedOrigins[0],
+    'Access-Control-Allow-Origin': allowed ? origin : '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
   };
 }
 
