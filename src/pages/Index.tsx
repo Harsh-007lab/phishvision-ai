@@ -10,11 +10,16 @@ import { InstallExtension } from "@/components/InstallExtension";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { LayoutDashboard, LogIn } from "lucide-react";
 import '../lib/i18n';
 
 const Index = () => {
   const [scanUrl, setScanUrl] = useState("");
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   useEffect(() => {
     // Update HTML lang attribute
@@ -61,6 +66,15 @@ const Index = () => {
         <div className="flex items-center gap-2 sm:gap-4">
           <LanguageSelector />
           <ReportModal />
+          {user ? (
+            <Button asChild variant="outline" size="sm" className="gap-2">
+              <Link to="/dashboard"><LayoutDashboard className="w-4 h-4" />Dashboard</Link>
+            </Button>
+          ) : (
+            <Button asChild variant="outline" size="sm" className="gap-2">
+              <Link to="/auth"><LogIn className="w-4 h-4" />Sign in</Link>
+            </Button>
+          )}
           <ThemeToggle />
         </div>
       </div>
