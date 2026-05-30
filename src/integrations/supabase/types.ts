@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookmarks: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          id: string
+          label: string | null
+          note: string | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          label?: string | null
+          note?: string | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          label?: string | null
+          note?: string | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       phishing_reports: {
         Row: {
           created_at: string
@@ -41,6 +71,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scan_history: {
         Row: {
           confidence: number
@@ -50,6 +104,7 @@ export type Database = {
           label: string
           score: number
           url: string
+          user_id: string | null
         }
         Insert: {
           confidence: number
@@ -59,6 +114,7 @@ export type Database = {
           label: string
           score: number
           url: string
+          user_id?: string | null
         }
         Update: {
           confidence?: number
@@ -68,6 +124,34 @@ export type Database = {
           label?: string
           score?: number
           url?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          aggressive_mode: boolean
+          auto_scan: boolean
+          language: string
+          notifications: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          aggressive_mode?: boolean
+          auto_scan?: boolean
+          language?: string
+          notifications?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          aggressive_mode?: boolean
+          auto_scan?: boolean
+          language?: string
+          notifications?: boolean
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
