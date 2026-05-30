@@ -278,13 +278,25 @@ serve(async (req) => {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
       const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseKey);
-      
+
+      // Best-effort user attribution from bearer token
+      let userId: string | null = null;
+      const authHeader = req.headers.get('authorization') || '';
+      const token = authHeader.toLowerCase().startsWith('bearer ') ? authHeader.slice(7) : '';
+      if (token && token !== supabaseKey) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser(token);
+          userId = user?.id ?? null;
+        } catch (_) {}
+      }
+
       await supabase.from('scan_history').insert({
         url,
         label,
         score: parseFloat(score.toFixed(2)),
         confidence: parseFloat((score * 100).toFixed(1)),
         explanation,
+        user_id: userId,
       });
     } catch (dbError) {
       console.error('Database save error:', dbError);
