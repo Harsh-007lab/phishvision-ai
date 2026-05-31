@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.report-phishing]
 verify_jwt = false
+
+[functions.scan-api]
+verify_jwt = false

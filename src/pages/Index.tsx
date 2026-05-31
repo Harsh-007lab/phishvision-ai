@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, LogIn, Activity } from "lucide-react";
+import { LayoutDashboard, LogIn, Activity, Layers } from "lucide-react";
 import '../lib/i18n';
 
 const Index = () => {
@@ -68,6 +68,9 @@ const Index = () => {
           <ReportModal />
           <Button asChild variant="outline" size="sm" className="gap-2">
             <Link to="/threats"><Activity className="w-4 h-4" />Threats</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <Link to="/bulk"><Layers className="w-4 h-4" />Bulk</Link>
           </Button>
           {user ? (
             <Button asChild variant="outline" size="sm" className="gap-2">
