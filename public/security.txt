@@ -1,0 +1,4 @@
+Contact: security@phishvision.ai
+Preferred-Languages: en
+Policy: https://phishvision.ai/security-policy
+Acknowledgments: https://phishvision.ai/hall-of-fame
