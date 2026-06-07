@@ -4,7 +4,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "Next-Generation Cybersecurity & Phishing Detection Platform",
       scanPlaceholder: "Enter URL to scan (e.g., https://example.com)",
       scanButton: "Scan Now",
@@ -36,14 +36,14 @@ const resources = {
       submitting: "Submitting...",
       reportSubmitted: "Report Submitted",
       thankYou: "Thank you for helping make the web safer!",
-      poweredBy: "Powered by LightGBM Heuristics & Lovable Cloud 💙",
+      poweredBy: "Powered by LightGBM heuristics & AI threat intelligence",
       helpInfo: "Help & Info",
       scrollToTop: "Scroll to top"
     }
   },
   hi: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "अगली पीढ़ी की साइबर सुरक्षा और फ़िशिंग पहचान प्लेटफ़ॉर्म",
       scanPlaceholder: "स्कैन करने के लिए URL दर्ज करें (जैसे, https://example.com)",
       scanButton: "अभी स्कैन करें",
@@ -82,7 +82,7 @@ const resources = {
   },
   es: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "Plataforma de Ciberseguridad y Detección de Phishing de Próxima Generación",
       scanPlaceholder: "Ingrese URL para escanear (ej., https://example.com)",
       scanButton: "Escanear ahora",
@@ -121,7 +121,7 @@ const resources = {
   },
   fr: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "Plateforme de Cybersécurité et Détection de Phishing de Nouvelle Génération",
       scanPlaceholder: "Entrez l'URL à analyser (ex., https://example.com)",
       scanButton: "Scanner maintenant",
@@ -160,7 +160,7 @@ const resources = {
   },
   ar: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "منصة الأمن السيبراني والكشف عن التصيد من الجيل التالي",
       scanPlaceholder: "أدخل عنوان URL للمسح (مثل، https://example.com)",
       scanButton: "المسح الآن",
