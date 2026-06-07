@@ -22,11 +22,11 @@ const ThreatFeed = () => {
   const load = async () => {
     setLoading(true);
     const { data } = await supabase
-      .from("scan_history")
+      .from("scan_history_public" as any)
       .select("id, url, label, confidence, score, created_at")
       .order("created_at", { ascending: false })
       .limit(100);
-    setScans(data || []);
+    setScans((data as unknown as ScanRecord[]) || []);
     setLoading(false);
   };
 
