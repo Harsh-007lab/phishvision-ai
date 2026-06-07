@@ -1,28 +1,20 @@
 import { useState } from "react";
-import { Shield, AlertTriangle, Loader2, Search, Copy, RotateCw, Sparkles } from "lucide-react";
+import { Shield, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { VoiceInput } from "./VoiceInput";
-import { PDFReport } from "./PDFReport";
 import { useTranslation } from "react-i18next";
-
-interface ScanResult {
-  url: string;
-  label: string;
-  confidence: number;
-  score: number;
-  explanation?: string;
-  timestamp: Date;
-}
+import { ScanningProgress } from "./ScanningProgress";
+import { ScanResult as ScanResultView, type ScanResultData } from "./ScanResult";
 
 export const Scanner = () => {
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [isExplaining, setIsExplaining] = useState(false);
-  const [result, setResult] = useState<ScanResult | null>(null);
+  const [result, setResult] = useState<ScanResultData | null>(null);
   const { t } = useTranslation();
 
   const handleVoiceTranscript = (transcript: string) => {
@@ -57,7 +49,23 @@ export const Scanner = () => {
 
       if (error) throw error;
 
-      const scanResult: ScanResult = {
+      // Try to recover the saved scan id so the result has a shareable link.
+      let scanId: string | undefined;
+      try {
+        const { data: latest } = await supabase
+          .from("scan_history_public" as any)
+          .select("id")
+          .eq("url", url.trim())
+          .order("created_at", { ascending: false })
+          .limit(1);
+        const row = Array.isArray(latest) ? (latest[0] as { id?: string } | undefined) : undefined;
+        scanId = row?.id;
+      } catch {
+        /* non-fatal */
+      }
+
+      const scanResult: ScanResultData = {
+        id: scanId ?? result?.id,
         url: url.trim(),
         label: data.label,
         confidence: data.confidence,
@@ -96,19 +104,11 @@ export const Scanner = () => {
     handleScan(true);
   };
 
-  const handleCopy = () => {
-    if (!result) return;
-    
-    const text = `PhishVision AI Scan Result\n\nURL: ${result.url}\nStatus: ${result.label === 'phishing' ? '⚠️ Phishing Detected' : '✅ Safe'}\nConfidence: ${result.confidence}%${result.explanation ? `\n\nAnalysis: ${result.explanation}` : ''}`;
-    
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: "Scan result copied to clipboard",
-    });
+  const handleScanAnother = () => {
+    setResult(null);
+    setUrl("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  const isPhishing = result?.label === 'phishing';
 
   return (
     <div className="w-full max-w-5xl min-w-0 mx-auto space-y-6 sm:space-y-8 p-3 sm:p-6 overflow-hidden">
