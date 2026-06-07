@@ -48,15 +48,26 @@ function updateSignals(url) {
 async function loadHistory() {
   const { history = [] } = await api.storage.local.get("history");
   const ul = $("historyList");
-  ul.innerHTML = "";
+  ul.textContent = "";
   if (!history.length) {
-    ul.innerHTML = `<li style="justify-content:center;color:var(--muted)">No scans yet</li>`;
+    const empty = document.createElement("li");
+    empty.style.justifyContent = "center";
+    empty.style.color = "var(--muted)";
+    empty.textContent = "No scans yet";
+    ul.appendChild(empty);
     return;
   }
   history.slice(0, 10).forEach((h) => {
     const { level } = classify(h.label, h.confidence);
     const li = document.createElement("li");
-    li.innerHTML = `<span class="h-domain">${h.domain || h.url}</span><span class="h-level ${level}">${h.confidence}%</span>`;
+    const domainSpan = document.createElement("span");
+    domainSpan.className = "h-domain";
+    domainSpan.textContent = h.domain || h.url;
+    const levelSpan = document.createElement("span");
+    levelSpan.className = `h-level ${level}`;
+    levelSpan.textContent = `${h.confidence}%`;
+    li.appendChild(domainSpan);
+    li.appendChild(levelSpan);
     ul.appendChild(li);
   });
 }
