@@ -75,7 +75,7 @@ const resources = {
       submitting: "सबमिट हो रहा है...",
       reportSubmitted: "रिपोर्ट सबमिट हुई",
       thankYou: "वेब को सुरक्षित बनाने में मदद के लिए धन्यवाद!",
-      poweredBy: "LightGBM Heuristics और Lovable Cloud द्वारा संचालित 💙",
+      poweredBy: "LightGBM ह्यूरिस्टिक्स & AI थ्रेट इंटेलिजेंस द्वारा संचालित",
       helpInfo: "सहायता और जानकारी",
       scrollToTop: "शीर्ष पर स्क्रॉल करें"
     }
@@ -114,7 +114,7 @@ const resources = {
       submitting: "Enviando...",
       reportSubmitted: "Informe Enviado",
       thankYou: "¡Gracias por ayudar a hacer la web más segura!",
-      poweredBy: "Impulsado por LightGBM Heuristics y Lovable Cloud 💙",
+      poweredBy: "Impulsado por heurísticas LightGBM e inteligencia de amenazas IA",
       helpInfo: "Ayuda e Información",
       scrollToTop: "Desplazarse hacia arriba"
     }
@@ -153,7 +153,7 @@ const resources = {
       submitting: "Soumission...",
       reportSubmitted: "Rapport Soumis",
       thankYou: "Merci d'aider à rendre le web plus sûr!",
-      poweredBy: "Propulsé par LightGBM Heuristics et Lovable Cloud 💙",
+      poweredBy: "Propulsé par les heuristiques LightGBM et l'intelligence des menaces IA",
       helpInfo: "Aide et Informations",
       scrollToTop: "Faire défiler vers le haut"
     }
@@ -192,7 +192,7 @@ const resources = {
       submitting: "جارٍ الإرسال...",
       reportSubmitted: "تم إرسال التقرير",
       thankYou: "شكرًا لك على المساعدة في جعل الويب أكثر أمانًا!",
-      poweredBy: "مدعوم من LightGBM Heuristics و Lovable Cloud 💙",
+      poweredBy: "مدعوم بـ LightGBM Heuristics وذكاء التهديدات بالذكاء الاصطناعي",
       helpInfo: "المساعدة والمعلومات",
       scrollToTop: "انتقل إلى الأعلى"
     }
