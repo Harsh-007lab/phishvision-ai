@@ -187,134 +187,17 @@ export const Scanner = () => {
           </Button>
         </div>
 
-        {/* Result Display */}
+        {/* Scanning state + Result */}
         <AnimatePresence mode="wait">
-          {result && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className={`rounded-xl p-4 sm:p-6 border-2 transition-all duration-500 w-full min-w-0 overflow-hidden ${
-                isPhishing
-                  ? 'bg-gradient-to-br from-destructive/20 to-destructive/5 border-destructive glow-danger'
-                  : 'bg-gradient-to-br from-success/20 to-success/5 border-success glow-safe'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                <motion.div
-                  animate={isPhishing ? { scale: [1, 1.1, 1] } : { scale: 1 }}
-                  transition={{ repeat: isPhishing ? Infinity : 0, duration: 2 }}
-                  className="flex-shrink-0"
-                >
-                  {isPhishing ? (
-                    <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-destructive" />
-                  ) : (
-                    <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-success" />
-                  )}
-                </motion.div>
-                
-                <div className="flex-1 min-w-0 space-y-3">
-                  <h3 className={`text-xl sm:text-2xl font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
-                    {isPhishing ? t('phishingDetected') : t('safeWebsite')}
-                  </h3>
-                  <p
-                    className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded-md bg-secondary/40 px-3 py-2 text-sm text-muted-foreground font-mono"
-                    title={result.url}
-                  >
-                    {result.url}
-                  </p>
-                  
-                  {/* Confidence Bar */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">{t('threatConfidence')}</span>
-                      <span className={`font-bold ${isPhishing ? 'text-destructive' : 'text-success'}`}>
-                        {result.confidence}%
-                      </span>
-                    </div>
-                    <div className="relative h-3 bg-secondary rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${result.confidence}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className={`h-full ${isPhishing ? 'bg-destructive' : 'bg-success'}`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* AI Explanation */}
-                  {result.explanation && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="mt-4 p-4 bg-secondary/50 rounded-lg border border-border"
-                    >
-                      <div className="flex items-start gap-2">
-                        <Sparkles className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-semibold text-primary mb-1">{t('aiAnalysis')}</p>
-                          <p className="text-sm text-foreground leading-relaxed">{result.explanation}</p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleScan(false)}
-                      className="gap-2"
-                    >
-                      <RotateCw className="w-4 h-4" />
-                      {t('rescan')}
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopy}
-                      className="gap-2"
-                    >
-                      <Copy className="w-4 h-4" />
-                      {t('copyResult')}
-                    </Button>
-
-                    {!result.explanation && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleExplain}
-                        disabled={isExplaining}
-                        className="gap-2 border-primary/50 text-primary hover:bg-primary/10"
-                      >
-                        {isExplaining ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            {t('analyzing')}
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            {t('explainWhy')}
-                          </>
-                        )}
-                      </Button>
-                    )}
-
-                    <PDFReport
-                      url={result.url}
-                      label={result.label}
-                      confidence={result.confidence}
-                      score={result.score}
-                      explanation={result.explanation}
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+          {isScanning && !result && <ScanningProgress key="progress" />}
+          {result && !isScanning && (
+            <ScanResultView
+              key="result"
+              result={result}
+              onScanAnother={handleScanAnother}
+              onExplain={handleExplain}
+              isExplaining={isExplaining}
+            />
           )}
         </AnimatePresence>
       </motion.div>
