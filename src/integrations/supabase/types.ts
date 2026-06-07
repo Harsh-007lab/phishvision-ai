@@ -190,7 +190,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      scan_history_public: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          explanation: string | null
+          id: string | null
+          label: string | null
+          score: number | null
+          url: string | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          label?: string | null
+          score?: number | null
+          url?: string | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string | null
+          explanation?: string | null
+          id?: string | null
+          label?: string | null
+          score?: number | null
+          url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
