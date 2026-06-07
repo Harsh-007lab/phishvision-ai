@@ -38,8 +38,8 @@ export const Analytics = () => {
   const loadStats = async () => {
     try {
       const { data: allScans } = await supabase
-        .from('scan_history')
-        .select('label, created_at');
+        .from('scan_history_public' as any)
+        .select('label, created_at') as { data: { label: string; created_at: string }[] | null };
 
       if (!allScans) return;
 
