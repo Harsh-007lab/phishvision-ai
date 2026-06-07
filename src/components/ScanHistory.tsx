@@ -22,13 +22,13 @@ export const ScanHistory = ({ onRescan }: { onRescan: (url: string) => void }) =
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('scan_history')
+        .from('scan_history_public' as any)
         .select('id, url, label, confidence, created_at')
         .order('created_at', { ascending: false })
         .limit(20);
 
       if (error) throw error;
-      setHistory(data || []);
+      setHistory((data as unknown as ScanRecord[]) || []);
     } catch (error) {
       console.error('Error loading history:', error);
     } finally {
