@@ -7,6 +7,8 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { HelpDialog } from "@/components/HelpDialog";
 import { InstallExtension } from "@/components/InstallExtension";
+import { HowItWorks } from "@/components/HowItWorks";
+import { Footer } from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -88,25 +90,13 @@ const Index = () => {
       {/* Main Content */}
       <div className="relative z-10 flex w-full min-w-0 flex-col items-center justify-center py-6 sm:py-12 px-3 sm:px-4 space-y-8 sm:space-y-12 overflow-x-hidden">
         <Scanner key={scanUrl} />
+        <HowItWorks />
         <InstallExtension />
         <Analytics />
         <ScanHistory onRescan={handleRescan} />
       </div>
 
-      {/* Footer */}
-      <div className="relative z-10 text-center py-8 text-sm text-muted-foreground">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-xs"
-        >
-          {t('tagline')}
-        </motion.p>
-        <p className="mt-1 text-xs opacity-70">
-          Last Updated: {new Date().toLocaleDateString()}
-        </p>
-      </div>
+      <Footer />
 
       {/* Floating Action Buttons */}
       <ScrollToTop />
