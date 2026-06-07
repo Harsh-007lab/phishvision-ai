@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import ThreatFeed from "./pages/ThreatFeed";
 import BulkScan from "./pages/BulkScan";
+import Report from "./pages/Report";
 import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/threats" element={<ThreatFeed />} />
             <Route path="/bulk" element={<BulkScan />} />
+            <Route path="/report/:scanId" element={<Report />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
