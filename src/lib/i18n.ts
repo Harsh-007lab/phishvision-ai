@@ -4,7 +4,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "Next-Generation Cybersecurity & Phishing Detection Platform",
       scanPlaceholder: "Enter URL to scan (e.g., https://example.com)",
       scanButton: "Scan Now",
@@ -36,14 +36,14 @@ const resources = {
       submitting: "Submitting...",
       reportSubmitted: "Report Submitted",
       thankYou: "Thank you for helping make the web safer!",
-      poweredBy: "Powered by LightGBM Heuristics & Lovable Cloud 💙",
+      poweredBy: "Powered by LightGBM heuristics & AI threat intelligence",
       helpInfo: "Help & Info",
       scrollToTop: "Scroll to top"
     }
   },
   hi: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "अगली पीढ़ी की साइबर सुरक्षा और फ़िशिंग पहचान प्लेटफ़ॉर्म",
       scanPlaceholder: "स्कैन करने के लिए URL दर्ज करें (जैसे, https://example.com)",
       scanButton: "अभी स्कैन करें",
@@ -75,14 +75,14 @@ const resources = {
       submitting: "सबमिट हो रहा है...",
       reportSubmitted: "रिपोर्ट सबमिट हुई",
       thankYou: "वेब को सुरक्षित बनाने में मदद के लिए धन्यवाद!",
-      poweredBy: "LightGBM Heuristics और Lovable Cloud द्वारा संचालित 💙",
+      poweredBy: "LightGBM ह्यूरिस्टिक्स & AI थ्रेट इंटेलिजेंस द्वारा संचालित",
       helpInfo: "सहायता और जानकारी",
       scrollToTop: "शीर्ष पर स्क्रॉल करें"
     }
   },
   es: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "Plataforma de Ciberseguridad y Detección de Phishing de Próxima Generación",
       scanPlaceholder: "Ingrese URL para escanear (ej., https://example.com)",
       scanButton: "Escanear ahora",
@@ -114,14 +114,14 @@ const resources = {
       submitting: "Enviando...",
       reportSubmitted: "Informe Enviado",
       thankYou: "¡Gracias por ayudar a hacer la web más segura!",
-      poweredBy: "Impulsado por LightGBM Heuristics y Lovable Cloud 💙",
+      poweredBy: "Impulsado por heurísticas LightGBM e inteligencia de amenazas IA",
       helpInfo: "Ayuda e Información",
       scrollToTop: "Desplazarse hacia arriba"
     }
   },
   fr: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "Plateforme de Cybersécurité et Détection de Phishing de Nouvelle Génération",
       scanPlaceholder: "Entrez l'URL à analyser (ex., https://example.com)",
       scanButton: "Scanner maintenant",
@@ -153,14 +153,14 @@ const resources = {
       submitting: "Soumission...",
       reportSubmitted: "Rapport Soumis",
       thankYou: "Merci d'aider à rendre le web plus sûr!",
-      poweredBy: "Propulsé par LightGBM Heuristics et Lovable Cloud 💙",
+      poweredBy: "Propulsé par les heuristiques LightGBM et l'intelligence des menaces IA",
       helpInfo: "Aide et Informations",
       scrollToTop: "Faire défiler vers le haut"
     }
   },
   ar: {
     translation: {
-      appName: "PhishVision AI v3.5",
+      appName: "PhishVision AI",
       tagline: "منصة الأمن السيبراني والكشف عن التصيد من الجيل التالي",
       scanPlaceholder: "أدخل عنوان URL للمسح (مثل، https://example.com)",
       scanButton: "المسح الآن",
@@ -192,7 +192,7 @@ const resources = {
       submitting: "جارٍ الإرسال...",
       reportSubmitted: "تم إرسال التقرير",
       thankYou: "شكرًا لك على المساعدة في جعل الويب أكثر أمانًا!",
-      poweredBy: "مدعوم من LightGBM Heuristics و Lovable Cloud 💙",
+      poweredBy: "مدعوم بـ LightGBM Heuristics وذكاء التهديدات بالذكاء الاصطناعي",
       helpInfo: "المساعدة والمعلومات",
       scrollToTop: "انتقل إلى الأعلى"
     }

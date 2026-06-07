@@ -116,7 +116,7 @@ export const Scanner = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-4"
+        className="text-center space-y-5"
       >
         <motion.div
           className="flex items-center justify-center gap-3"
@@ -124,13 +124,28 @@ export const Scanner = () => {
           transition={{ type: "spring", stiffness: 300 }}
         >
           <Shield className="w-12 h-12 text-primary animate-pulse-slow" />
-          <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-            {t('appName')}
+          <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient leading-tight">
+            Don't click that link — scan it first.
           </h1>
         </motion.div>
-        <p className="text-lg text-muted-foreground">
-          {t('tagline')}
+        <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          PhishVision checks 14 threat signals in under 3 seconds: domain age, SSL validity, WHOIS data, malware blacklists, redirect chains, visual brand impersonation, and more. Free. No login required.
         </p>
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-2">
+          {[
+            "14 threat signals checked",
+            "< 3 second scan time",
+            "Free — no account needed",
+          ].map((stat) => (
+            <span
+              key={stat}
+              className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs sm:text-sm font-medium text-foreground/90 backdrop-blur-sm"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              {stat}
+            </span>
+          ))}
+        </div>
       </motion.div>
 
       {/* Scanner Input */}

@@ -147,7 +147,7 @@ export const PDFReport = ({ url, label, confidence, score, explanation }: PDFRep
       pdf.setTextColor(150, 150, 150);
       pdf.setFontSize(9);
       pdf.text('PhishVision AI Secure Report', pageWidth / 2, footerY, { align: 'center' });
-      pdf.text('Powered by LightGBM Heuristics & Lovable Cloud', pageWidth / 2, footerY + 5, { align: 'center' });
+      pdf.text('Powered by LightGBM heuristics & AI threat intelligence', pageWidth / 2, footerY + 5, { align: 'center' });
 
       // Save PDF
       const fileName = `PhishVision_Report_${new Date().toISOString().split('T')[0]}.pdf`;
