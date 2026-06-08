@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Shield, Loader2, Mail, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,14 @@ import { useAuth } from "@/hooks/useAuth";
 const Auth = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const location = useLocation();
+  const defaultTab = location.pathname === "/signup" ? "signup" : "signin";
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
     if (!authLoading && user) navigate("/dashboard", { replace: true });
@@ -35,6 +39,12 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      return toast({ title: "Passwords don't match", variant: "destructive" });
+    }
+    if (!agreed) {
+      return toast({ title: "Please accept the Terms of Service", variant: "destructive" });
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
@@ -82,7 +92,7 @@ const Auth = () => {
           </h1>
         </Link>
 
-        <Tabs defaultValue="signin" className="w-full">
+        <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className="grid grid-cols-2 w-full">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -107,6 +117,9 @@ const Auth = () => {
               <Button type="submit" disabled={loading} className="w-full">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
               </Button>
+              <div className="text-xs text-center text-muted-foreground">
+                <Link to="/reset-password" className="hover:text-primary">Forgot password?</Link>
+              </div>
             </form>
           </TabsContent>
 
@@ -124,6 +137,14 @@ const Auth = () => {
                 <Label htmlFor="su-password">Password</Label>
                 <Input id="su-password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="glass" />
               </div>
+              <div>
+                <Label htmlFor="su-confirm">Confirm password</Label>
+                <Input id="su-confirm" type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="glass" />
+              </div>
+              <label className="flex items-start gap-2 text-xs text-muted-foreground">
+                <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5" />
+                <span>By signing up you agree to our <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>.</span>
+              </label>
               <Button type="submit" disabled={loading} className="w-full">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Account"}
               </Button>
