@@ -14,14 +14,13 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import { LayoutDashboard, LogIn, Activity, Layers } from "lucide-react";
+import { UserMenu } from "@/components/UserMenu";
+import { Activity, Layers } from "lucide-react";
 import '../lib/i18n';
 
 const Index = () => {
   const [scanUrl, setScanUrl] = useState("");
   const { t } = useTranslation();
-  const { user } = useAuth();
 
   useEffect(() => {
     // Update HTML lang attribute
@@ -74,15 +73,7 @@ const Index = () => {
           <Button asChild variant="outline" size="sm" className="gap-2">
             <Link to="/bulk"><Layers className="w-4 h-4" />Bulk</Link>
           </Button>
-          {user ? (
-            <Button asChild variant="outline" size="sm" className="gap-2">
-              <Link to="/dashboard"><LayoutDashboard className="w-4 h-4" />Dashboard</Link>
-            </Button>
-          ) : (
-            <Button asChild variant="outline" size="sm" className="gap-2">
-              <Link to="/auth"><LogIn className="w-4 h-4" />Sign in</Link>
-            </Button>
-          )}
+          <UserMenu />
           <ThemeToggle />
         </div>
       </div>
