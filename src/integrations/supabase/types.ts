@@ -161,6 +161,39 @@ export type Database = {
         }
         Relationships: []
       }
+      scans: {
+        Row: {
+          explanation: string | null
+          id: string
+          scanned_at: string
+          signals: Json
+          threat_score: number
+          url: string
+          user_id: string
+          verdict: string
+        }
+        Insert: {
+          explanation?: string | null
+          id?: string
+          scanned_at?: string
+          signals?: Json
+          threat_score?: number
+          url: string
+          user_id: string
+          verdict: string
+        }
+        Update: {
+          explanation?: string | null
+          id?: string
+          scanned_at?: string
+          signals?: Json
+          threat_score?: number
+          url?: string
+          user_id?: string
+          verdict?: string
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           aggressive_mode: boolean
