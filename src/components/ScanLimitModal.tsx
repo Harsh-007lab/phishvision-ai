@@ -65,6 +65,6 @@ export const GuestSignupPrompt = ({ open, onOpenChange }: GuestPromptProps) => (
           <Link to="/signup">Sign up free</Link>
         </Button>
       </DialogFooter>
-    </Dialog>
+    </DialogContent>
   </Dialog>
 );
