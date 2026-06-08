@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import ThreatFeed from "./pages/ThreatFeed";
 import BulkScan from "./pages/BulkScan";
 import Report from "./pages/Report";
+import ResetPassword from "./pages/ResetPassword";
 import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Auth />} />
+            <Route path="/signup" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/threats" element={<ThreatFeed />} />
             <Route path="/bulk" element={<BulkScan />} />
