@@ -9,13 +9,31 @@ import { VoiceInput } from "./VoiceInput";
 import { useTranslation } from "react-i18next";
 import { ScanningProgress } from "./ScanningProgress";
 import { ScanResult as ScanResultView, type ScanResultData } from "./ScanResult";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  computeVerdict,
+  deriveThreatSignals,
+} from "@/lib/threatSignals";
+import {
+  getScanCountToday,
+  incrementScanCount,
+  isOverLimit,
+  pushLocalHistory,
+  shouldShowGuestSignupPrompt,
+  markGuestSignupPromptShown,
+} from "@/lib/scanLimits";
+import { ScanLimitModal, GuestSignupPrompt } from "./ScanLimitModal";
 
 export const Scanner = () => {
   const [url, setUrl] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [isExplaining, setIsExplaining] = useState(false);
   const [result, setResult] = useState<ScanResultData | null>(null);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [guestPromptOpen, setGuestPromptOpen] = useState(false);
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const tier: "guest" | "free" = user ? "free" : "guest";
 
   const handleVoiceTranscript = (transcript: string) => {
     setUrl(transcript);
@@ -32,6 +50,12 @@ export const Scanner = () => {
         description: "Please enter a URL to scan",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Enforce daily scan limits (UI only).
+    if (!includeExplanation && isOverLimit(tier)) {
+      setLimitOpen(true);
       return;
     }
 
@@ -77,6 +101,44 @@ export const Scanner = () => {
       setResult(scanResult);
 
       if (!includeExplanation) {
+        // Count this scan against the daily limit.
+        incrementScanCount();
+
+        // Persist to user's scan history (or guest localStorage).
+        const verdict = computeVerdict(data.label, data.confidence);
+        const signals = deriveThreatSignals(url.trim(), data.label, data.confidence);
+
+        if (user) {
+          try {
+            await supabase.from("scans").insert({
+              user_id: user.id,
+              url: url.trim(),
+              threat_score: verdict.safetyScore,
+              verdict: verdict.band,
+              signals: signals as any,
+              explanation: data.explanation ?? null,
+            });
+          } catch (e) {
+            console.warn("Failed to save scan:", e);
+          }
+        } else {
+          pushLocalHistory({
+            id: scanResult.id ?? crypto.randomUUID(),
+            url: url.trim(),
+            verdict: verdict.band,
+            threat_score: verdict.safetyScore,
+            scanned_at: new Date().toISOString(),
+          });
+          if (shouldShowGuestSignupPrompt()) {
+            markGuestSignupPromptShown();
+            setGuestPromptOpen(true);
+          }
+          // Check for over-limit AFTER incrementing to flag the user next time.
+          if (getScanCountToday() >= 5) {
+            // gentle notice
+          }
+        }
+
         toast({
           title: "Scan Complete",
           description: `URL analyzed: ${data.label === 'phishing' ? 'Phishing detected!' : 'URL appears safe'}`,
@@ -112,6 +174,8 @@ export const Scanner = () => {
 
   return (
     <div className="w-full max-w-5xl min-w-0 mx-auto space-y-6 sm:space-y-8 p-3 sm:p-6 overflow-hidden">
+      <ScanLimitModal open={limitOpen} onOpenChange={setLimitOpen} tier={tier} />
+      <GuestSignupPrompt open={guestPromptOpen} onOpenChange={setGuestPromptOpen} />
       {/* Header with glitch effect */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
