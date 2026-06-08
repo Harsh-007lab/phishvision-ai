@@ -1,15 +1,37 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, LogOut, Bookmark, History, Trash2, ArrowLeft, Loader2, Key, Plus, Copy, Code2 } from "lucide-react";
+import { Shield, LogOut, History, Trash2, ArrowLeft, Loader2, Key, Plus, Copy, Code2, ExternalLink, RotateCw, Search as SearchIcon, ShieldAlert, ShieldCheck, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
-interface ScanRow { id: string; url: string; label: string; confidence: number; created_at: string; }
-interface BookmarkRow { id: string; url: string; label: string | null; confidence: number | null; note: string | null; created_at: string; }
+interface ScanRow {
+  id: string;
+  url: string;
+  threat_score: number;
+  verdict: "safe" | "suspicious" | "dangerous" | "unverified";
+  scanned_at: string;
+}
 interface ApiKeyRow { id: string; name: string; key_prefix: string; last_used_at: string | null; revoked_at: string | null; created_at: string; }
 
 async function sha256Hex(text: string): Promise<string> {
@@ -28,29 +50,34 @@ const Dashboard = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const [scans, setScans] = useState<ScanRow[]>([]);
-  const [bookmarks, setBookmarks] = useState<BookmarkRow[]>([]);
   const [profile, setProfile] = useState<{ display_name: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [apiKeys, setApiKeys] = useState<ApiKeyRow[]>([]);
   const [newKeyName, setNewKeyName] = useState("");
   const [creatingKey, setCreatingKey] = useState(false);
   const [revealedKey, setRevealedKey] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [verdictFilter, setVerdictFilter] = useState<string>("all");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
 
   useEffect(() => {
-    if (!authLoading && !user) navigate("/auth", { replace: true });
+    if (!authLoading && !user) navigate("/login", { replace: true });
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: s }, { data: b }, { data: p }, { data: k }] = await Promise.all([
-        supabase.from("scan_history").select("id,url,label,confidence,created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(50),
-        supabase.from("bookmarks").select("id,url,label,confidence,note,created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
+      const [{ data: s }, { data: p }, { data: k }] = await Promise.all([
+        (supabase.from("scans" as any) as any)
+          .select("id,url,threat_score,verdict,scanned_at")
+          .eq("user_id", user.id)
+          .order("scanned_at", { ascending: false })
+          .limit(500),
         supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
         supabase.from("api_keys").select("id,name,key_prefix,last_used_at,revoked_at,created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
       ]);
-      setScans(s || []);
-      setBookmarks(b || []);
+      setScans((s as unknown as ScanRow[]) || []);
       setProfile(p);
       setApiKeys(k || []);
       setLoading(false);
@@ -91,22 +118,10 @@ const Dashboard = () => {
     toast({ title: "Copied to clipboard" });
   };
 
-  const removeBookmark = async (id: string) => {
-    const { error } = await supabase.from("bookmarks").delete().eq("id", id);
-    if (error) return toast({ title: "Failed to remove", description: error.message, variant: "destructive" });
-    setBookmarks((b) => b.filter((x) => x.id !== id));
-  };
-
-  const bookmarkScan = async (scan: ScanRow) => {
-    if (!user) return;
-    const { error } = await supabase.from("bookmarks").upsert(
-      { user_id: user.id, url: scan.url, label: scan.label, confidence: scan.confidence },
-      { onConflict: "user_id,url" },
-    );
-    if (error) return toast({ title: "Failed to bookmark", description: error.message, variant: "destructive" });
-    toast({ title: "Bookmarked", description: scan.url });
-    const { data } = await supabase.from("bookmarks").select("id,url,label,confidence,note,created_at").eq("user_id", user.id).order("created_at", { ascending: false });
-    setBookmarks(data || []);
+  const deleteScan = async (id: string) => {
+    const { error } = await (supabase.from("scans" as any) as any).delete().eq("id", id);
+    if (error) return toast({ title: "Failed to delete", description: error.message, variant: "destructive" });
+    setScans((prev) => prev.filter((x) => x.id !== id));
   };
 
   if (authLoading || loading) {
@@ -117,9 +132,55 @@ const Dashboard = () => {
     );
   }
 
-  const safeCount = scans.filter((s) => s.label === "safe").length;
-  const phishingCount = scans.filter((s) => s.label === "phishing").length;
   const apiEndpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scan-api`;
+
+  // Stats
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const scansThisMonth = scans.filter((s) => new Date(s.scanned_at) >= startOfMonth).length;
+  const scansToday = scans.filter((s) => new Date(s.scanned_at) >= startOfDay).length;
+  const threatsDetected = scans.filter((s) => s.verdict === "dangerous" || s.verdict === "suspicious").length;
+  const safeCount = scans.filter((s) => s.verdict === "safe").length;
+
+  // Filtered table
+  const filteredScans = scans
+    .filter((s) => (search ? s.url.toLowerCase().includes(search.toLowerCase()) : true))
+    .filter((s) => (verdictFilter === "all" ? true : s.verdict === verdictFilter))
+    .filter((s) => (fromDate ? new Date(s.scanned_at) >= new Date(fromDate) : true))
+    .filter((s) => (toDate ? new Date(s.scanned_at) <= new Date(toDate + "T23:59:59") : true))
+    .slice(0, 50);
+
+  // Trend chart: last 30 days
+  const trend: { date: string; scans: number; threats: number }[] = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const dayScans = scans.filter((s) => s.scanned_at.slice(0, 10) === key);
+    trend.push({
+      date: key.slice(5),
+      scans: dayScans.length,
+      threats: dayScans.filter((s) => s.verdict === "dangerous" || s.verdict === "suspicious").length,
+    });
+  }
+
+  const verdictBadge = (v: string) => {
+    const map: Record<string, string> = {
+      dangerous: "bg-destructive/20 text-destructive border-destructive/40",
+      suspicious: "bg-amber-500/20 text-amber-600 border-amber-500/40",
+      safe: "bg-success/20 text-success border-success/40",
+      unverified: "bg-muted text-muted-foreground border-border",
+    };
+    return map[v] || map.unverified;
+  };
+
+  const scoreBadge = (score: number) => {
+    if (score <= 30) return "bg-destructive/20 text-destructive";
+    if (score <= 60) return "bg-amber-500/20 text-amber-600";
+    if (score <= 85) return "bg-yellow-500/20 text-yellow-600";
+    return "bg-success/20 text-success";
+  };
 
   return (
     <div className="min-h-screen relative overflow-x-hidden">
@@ -147,68 +208,134 @@ const Dashboard = () => {
           <p className="text-muted-foreground">Your personal threat intelligence dashboard.</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Section A — Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="glass rounded-xl p-4 border border-primary/30">
-            <p className="text-sm text-muted-foreground">Your scans</p>
-            <p className="text-3xl font-bold">{scans.length}</p>
-          </div>
-          <div className="glass rounded-xl p-4 border border-success/30">
-            <p className="text-sm text-muted-foreground">Safe URLs</p>
-            <p className="text-3xl font-bold text-success">{safeCount}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Scans this month</p>
+            <p className="text-3xl font-bold">{scansThisMonth}</p>
           </div>
           <div className="glass rounded-xl p-4 border border-destructive/30">
-            <p className="text-sm text-muted-foreground">Threats found</p>
-            <p className="text-3xl font-bold text-destructive">{phishingCount}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1"><ShieldAlert className="w-3 h-3" />Threats detected</p>
+            <p className="text-3xl font-bold text-destructive">{threatsDetected}</p>
+          </div>
+          <div className="glass rounded-xl p-4 border border-success/30">
+            <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1"><ShieldCheck className="w-3 h-3" />Safe confirmed</p>
+            <p className="text-3xl font-bold text-success">{safeCount}</p>
+          </div>
+          <div className="glass rounded-xl p-4 border border-accent/30">
+            <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1"><CalendarDays className="w-3 h-3" />Scanned today</p>
+            <p className="text-3xl font-bold">{scansToday}</p>
           </div>
         </div>
 
+        {/* Section C — Trend chart */}
         <section className="glass rounded-2xl p-4 sm:p-6 space-y-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2"><Bookmark className="w-5 h-5 text-primary" /> Bookmarks</h2>
-          {bookmarks.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No bookmarks yet. Save important scans from your history.</p>
-          ) : (
-            <div className="space-y-2">
-              {bookmarks.map((b) => (
-                <div key={b.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/40 border border-border">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-mono truncate" title={b.url}>{b.url}</p>
-                    {b.note && <p className="text-xs text-muted-foreground">{b.note}</p>}
-                  </div>
-                  {b.label && (
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${b.label === "phishing" ? "bg-destructive/20 text-destructive" : "bg-success/20 text-success"}`}>
-                      {b.label}
-                    </span>
-                  )}
-                  <Button variant="ghost" size="icon" onClick={() => removeBookmark(b.id)}>
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
+          <h2 className="text-xl font-semibold">Threat trend — last 30 days</h2>
+          <div className="w-full h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trend}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} />
+                <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{
+                    background: "hsl(var(--popover))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: 8,
+                  }}
+                />
+                <Legend />
+                <Line type="monotone" dataKey="scans" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} name="Scans" />
+                <Line type="monotone" dataKey="threats" stroke="hsl(var(--destructive))" strokeWidth={2} dot={false} name="Threats" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </section>
 
+        {/* Section B — Recent scan history */}
         <section className="glass rounded-2xl p-4 sm:p-6 space-y-4">
           <h2 className="text-xl font-semibold flex items-center gap-2"><History className="w-5 h-5 text-primary" /> Your scan history</h2>
-          {scans.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No personal scans yet. Run a scan while signed in to populate this list.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <div className="relative sm:col-span-2">
+              <SearchIcon className="absolute left-2 top-2.5 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by URL"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8"
+              />
+            </div>
+            <Select value={verdictFilter} onValueChange={setVerdictFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All verdicts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All verdicts</SelectItem>
+                <SelectItem value="safe">Safe</SelectItem>
+                <SelectItem value="suspicious">Suspicious</SelectItem>
+                <SelectItem value="dangerous">Dangerous</SelectItem>
+                <SelectItem value="unverified">Unverified</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex gap-1">
+              <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="text-xs" aria-label="From date" />
+              <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="text-xs" aria-label="To date" />
+            </div>
+          </div>
+
+          {filteredScans.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              {scans.length === 0 ? "No personal scans yet. Run a scan while signed in to populate this list." : "No scans match your filters."}
+            </p>
           ) : (
-            <div className="space-y-2 max-h-[500px] overflow-y-auto">
-              {scans.map((s) => (
-                <div key={s.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/40 border border-border">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-mono truncate" title={s.url}>{s.url}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleString()}</p>
-                  </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${s.label === "phishing" ? "bg-destructive/20 text-destructive" : "bg-success/20 text-success"}`}>
-                    {s.label}
-                  </span>
-                  <span className="text-sm font-bold">{s.confidence}%</span>
-                  <Button variant="ghost" size="icon" onClick={() => bookmarkScan(s)} title="Bookmark">
-                    <Bookmark className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
+            <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+              <table className="w-full text-sm">
+                <thead className="text-xs uppercase text-muted-foreground border-b border-border">
+                  <tr>
+                    <th className="text-left font-medium py-2 pr-2">URL</th>
+                    <th className="text-left font-medium py-2 px-2">Score</th>
+                    <th className="text-left font-medium py-2 px-2">Verdict</th>
+                    <th className="text-left font-medium py-2 px-2 hidden sm:table-cell">Scanned</th>
+                    <th className="text-right font-medium py-2 pl-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredScans.map((s) => (
+                    <tr key={s.id} className="border-b border-border/40 hover:bg-secondary/30">
+                      <td className="py-2 pr-2 max-w-xs">
+                        <Link to={`/report/${s.id}`} className="font-mono text-xs truncate block hover:text-primary" title={s.url}>
+                          {s.url}
+                        </Link>
+                      </td>
+                      <td className="py-2 px-2">
+                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${scoreBadge(s.threat_score)}`}>
+                          {s.threat_score}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-semibold border ${verdictBadge(s.verdict)}`}>
+                          {s.verdict}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2 text-xs text-muted-foreground hidden sm:table-cell">
+                        {new Date(s.scanned_at).toLocaleString()}
+                      </td>
+                      <td className="py-2 pl-2 text-right whitespace-nowrap">
+                        <Button variant="ghost" size="icon" asChild title="View Report">
+                          <Link to={`/report/${s.id}`}><ExternalLink className="w-4 h-4" /></Link>
+                        </Button>
+                        <Button variant="ghost" size="icon" asChild title="Re-scan">
+                          <Link to={`/?u=${encodeURIComponent(s.url)}`}><RotateCw className="w-4 h-4" /></Link>
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => deleteScan(s.id)} title="Delete">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </section>
