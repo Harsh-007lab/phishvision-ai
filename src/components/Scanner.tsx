@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Shield, Loader2, Search } from "lucide-react";
+import { Shield, Loader2, Search, Link2, QrCode, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +10,8 @@ import { VoiceInput } from "./VoiceInput";
 import { useTranslation } from "react-i18next";
 import { ScanningProgress } from "./ScanningProgress";
 import { ScanResult as ScanResultView, type ScanResultData } from "./ScanResult";
+import { QRScanTab } from "./QRScanTab";
+import { BulkScanTab } from "./BulkScanTab";
 import { useAuth } from "@/hooks/useAuth";
 import {
   computeVerdict,
@@ -172,6 +175,11 @@ export const Scanner = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleQrScan = (decodedUrl: string) => {
+    setUrl(decodedUrl);
+    setTimeout(() => handleScan(false), 100);
+  };
+
   return (
     <div className="w-full max-w-5xl min-w-0 mx-auto space-y-6 sm:space-y-8 p-3 sm:p-6 overflow-hidden">
       <ScanLimitModal open={limitOpen} onOpenChange={setLimitOpen} tier={tier} />
@@ -218,7 +226,15 @@ export const Scanner = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="glass rounded-2xl p-4 sm:p-8 space-y-6 glow-primary w-full min-w-0 overflow-hidden"
       >
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <Tabs defaultValue="url" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsTrigger value="url" className="gap-2"><Link2 className="w-4 h-4" />URL</TabsTrigger>
+            <TabsTrigger value="qr" className="gap-2"><QrCode className="w-4 h-4" />QR Code</TabsTrigger>
+            <TabsTrigger value="bulk" className="gap-2"><Layers className="w-4 h-4" />Bulk</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="url">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex gap-2 sm:gap-4 flex-1">
             <Input
               placeholder={t('scanPlaceholder')}
@@ -249,7 +265,17 @@ export const Scanner = () => {
               </>
             )}
           </Button>
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="qr">
+            <QRScanTab onScan={handleQrScan} disabled={isScanning || isExplaining} />
+          </TabsContent>
+
+          <TabsContent value="bulk">
+            <BulkScanTab isPro={false} />
+          </TabsContent>
+        </Tabs>
 
         {/* Scanning state + Result */}
         <AnimatePresence mode="wait">
