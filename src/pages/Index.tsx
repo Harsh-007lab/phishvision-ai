@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/UserMenu";
-import { Activity, Layers } from "lucide-react";
+import { Activity, Layers, Tag } from "lucide-react";
 import '../lib/i18n';
 
 const Index = () => {
@@ -72,6 +72,9 @@ const Index = () => {
           </Button>
           <Button asChild variant="outline" size="sm" className="gap-2">
             <Link to="/bulk"><Layers className="w-4 h-4" />Bulk</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <Link to="/pricing"><Tag className="w-4 h-4" />Pricing</Link>
           </Button>
           <UserMenu />
           <ThemeToggle />
