@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Shield, Loader2, Search } from "lucide-react";
+import { Shield, Loader2, Search, Link2, QrCode, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +10,8 @@ import { VoiceInput } from "./VoiceInput";
 import { useTranslation } from "react-i18next";
 import { ScanningProgress } from "./ScanningProgress";
 import { ScanResult as ScanResultView, type ScanResultData } from "./ScanResult";
+import { QRScanTab } from "./QRScanTab";
+import { BulkScanTab } from "./BulkScanTab";
 import { useAuth } from "@/hooks/useAuth";
 import {
   computeVerdict,
