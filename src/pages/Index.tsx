@@ -9,13 +9,14 @@ import { HelpDialog } from "@/components/HelpDialog";
 import { InstallExtension } from "@/components/InstallExtension";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/Navbar";
+import { StatsBanner } from "@/components/StatsBanner";
+import { Testimonials } from "@/components/Testimonials";
+import { ThreatChecks } from "@/components/ThreatChecks";
+import { FinalCTA } from "@/components/FinalCTA";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { UserMenu } from "@/components/UserMenu";
-import { Activity, Layers, Tag } from "lucide-react";
 import '../lib/i18n';
 
 const Index = () => {
@@ -62,32 +63,28 @@ const Index = () => {
         />
       </div>
 
-      {/* Header */}
-      <div className="relative z-10 flex justify-end p-4 sm:p-6">
-        <div className="flex items-center gap-2 sm:gap-4">
-          <LanguageSelector />
-          <ReportModal />
-          <Button asChild variant="outline" size="sm" className="gap-2">
-            <Link to="/threats"><Activity className="w-4 h-4" />Threats</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="gap-2">
-            <Link to="/bulk"><Layers className="w-4 h-4" />Bulk</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm" className="gap-2">
-            <Link to="/pricing"><Tag className="w-4 h-4" />Pricing</Link>
-          </Button>
-          <UserMenu />
-          <ThemeToggle />
-        </div>
+      <Navbar />
+
+      {/* Utility bar */}
+      <div className="relative z-10 flex justify-end px-4 sm:px-6 pt-3 gap-2">
+        <LanguageSelector />
+        <ReportModal />
+        <ThemeToggle />
       </div>
 
       {/* Main Content */}
       <div className="relative z-10 flex w-full min-w-0 flex-col items-center justify-center py-6 sm:py-12 px-3 sm:px-4 space-y-8 sm:space-y-12 overflow-x-hidden">
-        <Scanner key={scanUrl} />
+        <div id="scanner" className="w-full flex justify-center scroll-mt-24">
+          <Scanner key={scanUrl} />
+        </div>
+        <StatsBanner />
         <HowItWorks />
+        <Testimonials />
+        <ThreatChecks />
         <InstallExtension />
         <Analytics />
         <ScanHistory onRescan={handleRescan} />
+        <FinalCTA />
       </div>
 
       <Footer />
