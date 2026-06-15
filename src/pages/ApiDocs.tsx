@@ -306,6 +306,8 @@ export default function ApiDocs() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
+              id="endpoints"
+              className="scroll-mt-24"
             >
               <h2 className="text-2xl sm:text-3xl font-bold mb-4">Endpoints</h2>
               <div className="space-y-6">
@@ -319,6 +321,8 @@ export default function ApiDocs() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
+              id="rate-limits"
+              className="scroll-mt-24"
             >
               <h2 className="text-2xl sm:text-3xl font-bold mb-4">Rate limits</h2>
               <Card className="glass overflow-hidden">
