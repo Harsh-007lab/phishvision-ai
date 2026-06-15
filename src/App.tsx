@@ -12,6 +12,7 @@ import BulkScan from "./pages/BulkScan";
 import Report from "./pages/Report";
 import ResetPassword from "./pages/ResetPassword";
 import Pricing from "./pages/Pricing";
+import ApiDocs from "./pages/ApiDocs";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import SecurityPolicy from "./pages/SecurityPolicy";
