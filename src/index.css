@@ -8,49 +8,68 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    /* Phase 9 palette — dark base */
+    --background: 218 28% 6%;          /* #0a0d12 */
+    --foreground: 219 38% 93%;         /* #e8edf5 */
 
-    --card: 222 47% 14%;
-    --card-foreground: 210 40% 98%;
+    --card: 224 26% 14%;               /* #1a1f2e elevated */
+    --card-foreground: 219 38% 93%;
 
-    --popover: 222 47% 14%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 224 26% 14%;
+    --popover-foreground: 219 38% 93%;
 
-    --primary: 189 97% 55%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 167 100% 42%;           /* #00d4aa accent */
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 225 30% 10%;          /* #111520 surface */
+    --secondary-foreground: 219 38% 93%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 225 30% 10%;
+    --muted-foreground: 220 12% 60%;   /* #8892a4 */
 
-    --accent: 189 97% 55%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 167 100% 42%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;          /* #ef4444 */
+    --destructive-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
+    --success: 142 71% 45%;            /* #22c55e */
+    --success-foreground: 0 0% 0%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
+    --warning: 38 92% 50%;             /* #f59e0b */
+    --warning-foreground: 0 0% 0%;
 
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 189 97% 55%;
+    --border: 0 0% 100%;               /* used via /0.08 utility */
+    --input: 225 30% 10%;
+    --ring: 167 100% 42%;
 
     --radius: 0.75rem;
 
-    --gradient-cyber: linear-gradient(135deg, hsl(189 97% 55% / 0.1), hsl(217 33% 17%));
-    --gradient-danger: linear-gradient(135deg, hsl(0 84% 60% / 0.3), hsl(0 84% 40% / 0.1));
-    --gradient-safe: linear-gradient(135deg, hsl(142 76% 36% / 0.3), hsl(142 76% 26% / 0.1));
-    
-    --glow-primary: 0 0 40px hsl(189 97% 55% / 0.4);
-    --glow-danger: 0 0 40px hsl(0 84% 60% / 0.5);
-    --glow-safe: 0 0 40px hsl(142 76% 36% / 0.5);
+    /* Phase 9 raw tokens (for non-shadcn usage) */
+    --color-bg: #0a0d12;
+    --color-bg-surface: #111520;
+    --color-bg-elevated: #1a1f2e;
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-hover: rgba(255, 255, 255, 0.16);
+    --color-text-primary: #e8edf5;
+    --color-text-secondary: #8892a4;
+    --color-text-muted: #5a6478;
+    --color-accent: #00d4aa;
+    --color-accent-hover: #00b894;
+    --color-danger: #ef4444;
+    --color-danger-bg: rgba(239, 68, 68, 0.1);
+    --color-warn: #f59e0b;
+    --color-warn-bg: rgba(245, 158, 11, 0.1);
+    --color-safe: #22c55e;
+    --color-safe-bg: rgba(34, 197, 94, 0.1);
+
+    --gradient-cyber: linear-gradient(135deg, hsl(167 100% 42% / 0.12), hsl(225 30% 10%));
+    --gradient-danger: linear-gradient(135deg, hsl(0 84% 60% / 0.3), hsl(0 84% 40% / 0.05));
+    --gradient-safe: linear-gradient(135deg, hsl(142 71% 45% / 0.3), hsl(142 71% 30% / 0.05));
+
+    --glow-primary: 0 0 40px hsl(167 100% 42% / 0.35);
+    --glow-danger: 0 0 40px hsl(0 84% 60% / 0.45);
+    --glow-safe: 0 0 40px hsl(142 71% 45% / 0.45);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -65,7 +84,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 189 97% 45%;
+    --primary: 167 100% 32%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96%;
@@ -74,29 +93,21 @@ All colors MUST be HSL.
     --muted: 210 40% 96%;
     --muted-foreground: 215 20% 35%;
 
-    --accent: 189 97% 45%;
+    --accent: 167 100% 32%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
+    --success: 142 71% 38%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning: 38 92% 45%;
+    --warning-foreground: 0 0% 0%;
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 189 97% 45%;
-
-    --gradient-cyber: linear-gradient(135deg, hsl(189 97% 55% / 0.1), hsl(210 40% 98%));
-    --gradient-danger: linear-gradient(135deg, hsl(0 84% 60% / 0.2), hsl(0 84% 95%));
-    --gradient-safe: linear-gradient(135deg, hsl(142 76% 36% / 0.2), hsl(142 76% 95%));
-    
-    --glow-primary: 0 0 40px hsl(189 97% 55% / 0.2);
-    --glow-danger: 0 0 40px hsl(0 84% 60% / 0.3);
-    --glow-safe: 0 0 40px hsl(142 76% 36% / 0.3);
+    --ring: 167 100% 32%;
   }
 }
 
@@ -108,22 +119,44 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground transition-colors duration-300;
     min-height: 100vh;
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    font-weight: 400;
   }
 
   :root:not(.light) body {
-    background: linear-gradient(to bottom, hsl(222 47% 11%), hsl(222 47% 8%));
+    background: linear-gradient(to bottom, #0a0d12, #07090d);
   }
 
   .light body {
     background: linear-gradient(to bottom, hsl(0 0% 100%), hsl(210 40% 98%));
   }
+
+  h1 { font-size: clamp(32px, 5vw, 48px); font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; }
+  h2 { font-size: clamp(24px, 4vw, 32px); font-weight: 600; line-height: 1.2; letter-spacing: -0.015em; }
+  h3 { font-size: 22px; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; }
+  h4 { font-size: 16px; font-weight: 500; line-height: 1.4; }
+
+  code, kbd, pre, samp, .font-mono {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+
+  /* Input focus glow */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
+  }
 }
 
 @layer utilities {
   .glass {
-    background: hsl(var(--card) / 0.6);
+    background: var(--color-bg-elevated);
     backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--border) / 0.5);
+    border: 0.5px solid var(--color-border);
   }
 
   .light .glass {
@@ -131,6 +164,29 @@ All colors MUST be HSL.
     backdrop-filter: blur(12px);
     border: 1px solid hsl(var(--border) / 0.8);
   }
+
+  .font-mono-num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  /* Phase 9 badges */
+  .badge-danger,
+  .badge-warn,
+  .badge-safe,
+  .badge-info {
+    display: inline-flex;
+    align-items: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-width: 1px;
+    border-style: solid;
+  }
+  .badge-danger { background: var(--color-danger-bg); color: var(--color-danger); border-color: rgba(239,68,68,0.25); }
+  .badge-warn   { background: var(--color-warn-bg);   color: var(--color-warn);   border-color: rgba(245,158,11,0.25); }
+  .badge-safe   { background: var(--color-safe-bg);   color: var(--color-safe);   border-color: rgba(34,197,94,0.25); }
+  .badge-info   { background: rgba(0,212,170,0.1);    color: var(--color-accent); border-color: rgba(0,212,170,0.25); }
 
   .glow-primary {
     box-shadow: var(--glow-primary);
@@ -160,5 +216,11 @@ All colors MUST be HSL.
     50% {
       background-position: 100% 50%;
     }
+  }
+
+  @keyframes scan-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
   }
 }
