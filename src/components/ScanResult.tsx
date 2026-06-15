@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   RotateCw,
@@ -98,6 +98,19 @@ function ScoreGauge({
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
 
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v));
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    const controls = animate(count, score, { duration: 1, ease: "easeOut" });
+    const unsub = rounded.on("change", (v) => setDisplay(v));
+    return () => {
+      controls.stop();
+      unsub();
+    };
+  }, [score, count, rounded]);
+
   return (
     <div className="relative w-44 h-44 flex-shrink-0">
       <svg viewBox="0 0 160 160" className="w-full h-full -rotate-90">
@@ -106,7 +119,7 @@ function ScoreGauge({
           cy="80"
           r={radius}
           strokeWidth="12"
-          className="stroke-secondary"
+          className="stroke-secondary/60"
           fill="none"
         />
         <motion.circle
@@ -120,14 +133,19 @@ function ScoreGauge({
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`text-5xl sm:text-6xl font-bold leading-none ${theme.text}`}>
-          {score}
+        <span
+          className={`font-mono leading-none ${theme.text}`}
+          style={{ fontSize: "56px", fontWeight: 500 }}
+        >
+          {display}
         </span>
-        <span className="text-xs text-muted-foreground mt-1">/ 100 safety</span>
+        <span className="text-[13px] text-muted-foreground mt-1 tracking-wide">
+          / 100 safety
+        </span>
       </div>
     </div>
   );
