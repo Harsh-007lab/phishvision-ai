@@ -40,6 +40,7 @@ const App = () => (
             <Route path="/bulk" element={<BulkScan />} />
             <Route path="/report/:scanId" element={<Report />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/api" element={<ApiDocs />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/security-policy" element={<SecurityPolicy />} />
