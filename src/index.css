@@ -39,8 +39,8 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;             /* #f59e0b */
     --warning-foreground: 0 0% 0%;
 
-    --border: 0 0% 100%;               /* used via /0.08 utility */
-    --input: 225 30% 10%;
+    --border: 220 12% 14%;             /* ≈ rgba(255,255,255,0.08) on bg */
+    --input: 220 12% 18%;
     --ring: 167 100% 42%;
 
     --radius: 0.75rem;
