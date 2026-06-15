@@ -279,6 +279,8 @@ export default function ApiDocs() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
+              id="auth"
+              className="scroll-mt-24"
             >
               <h2 className="text-2xl sm:text-3xl font-bold mb-4">Authentication</h2>
               <Card className="glass p-6 sm:p-8">
