@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, LogOut, History, Trash2, ArrowLeft, Loader2, Key, Plus, Copy, Code2, ExternalLink, RotateCw, Search as SearchIcon, ShieldAlert, ShieldCheck, CalendarDays } from "lucide-react";
+import { Shield, LogOut, History, Trash2, ArrowLeft, Loader2, Key, Plus, Copy, Code2, ExternalLink, RotateCw, Search as SearchIcon, ShieldAlert, ShieldCheck, CalendarDays, Settings as SettingsIcon } from "lucide-react";
+import { ProtectionStats } from "@/components/dashboard/ProtectionStats";
+import { ScanStreak } from "@/components/dashboard/ScanStreak";
+import { ShareStats } from "@/components/dashboard/ShareStats";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -196,6 +199,7 @@ const Dashboard = () => {
         </Link>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" asChild><Link to="/"><ArrowLeft className="w-4 h-4 mr-1" />Scanner</Link></Button>
+          <Button variant="ghost" size="sm" asChild><Link to="/settings"><SettingsIcon className="w-4 h-4 mr-1" />Settings</Link></Button>
           <Button variant="outline" size="sm" onClick={() => signOut().then(() => navigate("/"))}>
             <LogOut className="w-4 h-4 mr-1" /> Sign out
           </Button>
@@ -203,10 +207,22 @@ const Dashboard = () => {
       </header>
 
       <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-8">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold">Welcome back, {profile?.display_name || user?.email}</h1>
-          <p className="text-muted-foreground">Your personal threat intelligence dashboard.</p>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="space-y-1">
+            <h1 className="text-2xl sm:text-3xl font-bold">Welcome back, {profile?.display_name || user?.email}</h1>
+            <p className="text-muted-foreground">Your personal threat intelligence dashboard.</p>
+          </div>
+          <ShareStats
+            scansThisMonth={scansThisMonth}
+            threatsBlocked={threatsDetected}
+          />
         </motion.div>
+
+        {/* Gamification — Protection stats + streak */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div className="lg:col-span-2"><ProtectionStats scans={scans} /></div>
+          <ScanStreak scans={scans} />
+        </div>
 
         {/* Section A — Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

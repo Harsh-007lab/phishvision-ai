@@ -14,6 +14,7 @@ import { StatsBanner } from "@/components/StatsBanner";
 import { Testimonials } from "@/components/Testimonials";
 import { ThreatChecks } from "@/components/ThreatChecks";
 import { FinalCTA } from "@/components/FinalCTA";
+import { LiveThreatFeed } from "@/components/LiveThreatFeed";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -84,6 +85,7 @@ const Index = () => {
         <InstallExtension />
         <Analytics />
         <ScanHistory onRescan={handleRescan} />
+        <LiveThreatFeed />
         <FinalCTA />
       </div>
 
