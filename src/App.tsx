@@ -19,6 +19,7 @@ import SecurityPolicy from "./pages/SecurityPolicy";
 import HallOfFame from "./pages/HallOfFame";
 import Contact from "./pages/Contact";
 import ChromeExtension from "./pages/ChromeExtension";
+import Settings from "./pages/Settings";
 import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/hall-of-fame" element={<HallOfFame />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/chrome-extension" element={<ChromeExtension />} />
+            <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

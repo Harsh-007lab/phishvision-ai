@@ -200,24 +200,33 @@ export type Database = {
           auto_scan: boolean
           language: string
           notifications: boolean
+          scan_reminders: boolean
+          threat_alerts: boolean
           updated_at: string
           user_id: string
+          weekly_digest: boolean
         }
         Insert: {
           aggressive_mode?: boolean
           auto_scan?: boolean
           language?: string
           notifications?: boolean
+          scan_reminders?: boolean
+          threat_alerts?: boolean
           updated_at?: string
           user_id: string
+          weekly_digest?: boolean
         }
         Update: {
           aggressive_mode?: boolean
           auto_scan?: boolean
           language?: string
           notifications?: boolean
+          scan_reminders?: boolean
+          threat_alerts?: boolean
           updated_at?: string
           user_id?: string
+          weekly_digest?: boolean
         }
         Relationships: []
       }
