@@ -46,7 +46,7 @@ const Auth = () => {
       return toast({ title: "Please accept the Terms of Service", variant: "destructive" });
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -55,7 +55,29 @@ const Auth = () => {
       },
     });
     setLoading(false);
-    if (error) return toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+    if (error) {
+      const alreadyExists =
+        error.status === 422 ||
+        /already registered|already exists|user already/i.test(error.message);
+      return toast({
+        title: alreadyExists ? "Account already exists" : "Sign up failed",
+        description: alreadyExists
+          ? "An account with this email already exists. Try signing in, or reset your password."
+          : error.message,
+        variant: "destructive",
+      });
+    }
+
+    // Supabase returns a user with an empty identities array when the email
+    // is already registered (to avoid leaking accounts). Treat that as existing.
+    if (data.user && (data.user.identities?.length ?? 0) === 0) {
+      return toast({
+        title: "Account already exists",
+        description: "An account with this email already exists. Try signing in, or reset your password.",
+        variant: "destructive",
+      });
+    }
+
     toast({ title: "Check your email", description: "Confirm your address to finish signing up." });
   };
 
