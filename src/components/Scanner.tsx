@@ -26,6 +26,7 @@ import {
   markGuestSignupPromptShown,
 } from "@/lib/scanLimits";
 import { ScanLimitModal, GuestSignupPrompt } from "./ScanLimitModal";
+import { validateScanUrl } from "@/lib/urlValidation";
 
 export const Scanner = () => {
   const [url, setUrl] = useState("");
@@ -34,6 +35,7 @@ export const Scanner = () => {
   const [result, setResult] = useState<ScanResultData | null>(null);
   const [limitOpen, setLimitOpen] = useState(false);
   const [guestPromptOpen, setGuestPromptOpen] = useState(false);
+  const [urlError, setUrlError] = useState<string | null>(null);
   const { t } = useTranslation();
   const { user } = useAuth();
   const tier: "guest" | "free" = user ? "free" : "guest";
@@ -47,14 +49,18 @@ export const Scanner = () => {
   };
 
   const handleScan = async (includeExplanation = false) => {
-    if (!url.trim()) {
+    const validation = validateScanUrl(url);
+    if (!validation.valid) {
+      setUrlError(validation.error ?? "Invalid URL");
       toast({
-        title: "Error",
-        description: "Please enter a URL to scan",
+        title: "Invalid URL",
+        description: validation.error,
         variant: "destructive",
       });
       return;
     }
+    setUrlError(null);
+    const targetUrl = validation.normalized;
 
     // Enforce daily scan limits (UI only).
     if (!includeExplanation && isOverLimit(tier)) {
@@ -71,7 +77,7 @@ export const Scanner = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('phishing-detector', {
-        body: { url: url.trim(), includeExplanation }
+        body: { url: targetUrl, includeExplanation }
       });
 
       if (error) throw error;
@@ -82,7 +88,7 @@ export const Scanner = () => {
         const { data: latest } = await supabase
           .from("scan_history_public" as any)
           .select("id")
-          .eq("url", url.trim())
+          .eq("url", targetUrl)
           .order("created_at", { ascending: false })
           .limit(1);
         const row = Array.isArray(latest) ? (latest[0] as { id?: string } | undefined) : undefined;
@@ -93,7 +99,7 @@ export const Scanner = () => {
 
       const scanResult: ScanResultData = {
         id: scanId ?? result?.id,
-        url: url.trim(),
+        url: targetUrl,
         label: data.label,
         confidence: data.confidence,
         score: data.score,
@@ -109,13 +115,13 @@ export const Scanner = () => {
 
         // Persist to user's scan history (or guest localStorage).
         const verdict = computeVerdict(data.label, data.confidence);
-        const signals = deriveThreatSignals(url.trim(), data.label, data.confidence);
+        const signals = deriveThreatSignals(targetUrl, data.label, data.confidence);
 
         if (user) {
           try {
             await supabase.from("scans").insert({
               user_id: user.id,
-              url: url.trim(),
+              url: targetUrl,
               threat_score: verdict.safetyScore,
               verdict: verdict.band,
               signals: signals as any,
@@ -127,7 +133,7 @@ export const Scanner = () => {
         } else {
           pushLocalHistory({
             id: scanResult.id ?? crypto.randomUUID(),
-            url: url.trim(),
+            url: targetUrl,
             verdict: verdict.band,
             threat_score: verdict.safetyScore,
             scanned_at: new Date().toISOString(),
@@ -172,6 +178,7 @@ export const Scanner = () => {
   const handleScanAnother = () => {
     setResult(null);
     setUrl("");
+    setUrlError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -234,14 +241,19 @@ export const Scanner = () => {
           </TabsList>
 
           <TabsContent value="url">
+            <div className="space-y-2">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex gap-2 sm:gap-4 flex-1">
             <Input
               placeholder={t('scanPlaceholder')}
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={(e) => {
+                setUrl(e.target.value);
+                if (urlError) setUrlError(null);
+              }}
               onKeyDown={(e) => e.key === 'Enter' && !isScanning && handleScan(false)}
-              className="flex-1 h-12 sm:h-14 text-base sm:text-lg glass border-primary/30 focus:border-primary transition-all"
+              aria-invalid={!!urlError}
+              className={`flex-1 h-12 sm:h-14 text-base sm:text-lg glass transition-all ${urlError ? "border-destructive focus:border-destructive" : "border-primary/30 focus:border-primary"}`}
               disabled={isScanning || isExplaining}
             />
             <VoiceInput onTranscript={handleVoiceTranscript} />
@@ -265,6 +277,10 @@ export const Scanner = () => {
               </>
             )}
           </Button>
+            </div>
+            {urlError && (
+              <p className="text-sm text-destructive px-1">{urlError}</p>
+            )}
             </div>
           </TabsContent>
 
