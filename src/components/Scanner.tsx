@@ -178,6 +178,7 @@ export const Scanner = () => {
   const handleScanAnother = () => {
     setResult(null);
     setUrl("");
+    setUrlError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -240,14 +241,19 @@ export const Scanner = () => {
           </TabsList>
 
           <TabsContent value="url">
+            <div className="space-y-2">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex gap-2 sm:gap-4 flex-1">
             <Input
               placeholder={t('scanPlaceholder')}
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={(e) => {
+                setUrl(e.target.value);
+                if (urlError) setUrlError(null);
+              }}
               onKeyDown={(e) => e.key === 'Enter' && !isScanning && handleScan(false)}
-              className="flex-1 h-12 sm:h-14 text-base sm:text-lg glass border-primary/30 focus:border-primary transition-all"
+              aria-invalid={!!urlError}
+              className={`flex-1 h-12 sm:h-14 text-base sm:text-lg glass transition-all ${urlError ? "border-destructive focus:border-destructive" : "border-primary/30 focus:border-primary"}`}
               disabled={isScanning || isExplaining}
             />
             <VoiceInput onTranscript={handleVoiceTranscript} />
@@ -271,6 +277,10 @@ export const Scanner = () => {
               </>
             )}
           </Button>
+            </div>
+            {urlError && (
+              <p className="text-sm text-destructive px-1">{urlError}</p>
+            )}
             </div>
           </TabsContent>
 
